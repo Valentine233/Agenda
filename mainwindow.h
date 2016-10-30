@@ -21,11 +21,11 @@ public:
     void time();
     void button();
     void setinit();
-    CreateNew *ct = new CreateNew;
+    CreateNew *ct = new CreateNew(this);
 
 public slots:
     void open();
-    void add(QString day, QString time1, QString time2);
+    void add(QString, QString, QString);
 
 private:
     Ui::MainWindow *ui;
