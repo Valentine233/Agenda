@@ -21,6 +21,7 @@ void CreateNew::setinit()
     time_c->setGeometry(QRect(100,250,100,30));
     time_c->setText("Time: ");
 
+
     time1 = new QLineEdit(this);
     time1->setGeometry(200,250,100,30);
 
@@ -31,11 +32,9 @@ void CreateNew::setinit()
     time2 = new QLineEdit(this);
     time2->setGeometry(310,250,100,30);
 
-    QPushButton *ok = new QPushButton ( "&OK", this);
-    ok->setGeometry(400,400,80,40);
-    ok->setStyleSheet("QPushButton {color: black;}");
-    QObject::connect(ok, SIGNAL(clicked(bool)), SLOT(send()));
-
-
+    QPushButton *confirmButton = new QPushButton ( "&OK", this);
+    confirmButton->setGeometry(400,400,80,40);
+    confirmButton->setStyleSheet("QPushButton {color: black;}");
+    QObject::connect(confirmButton, SIGNAL(clicked(bool)), SLOT(send()));
 }
 

@@ -7,6 +7,7 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QPushButton>
+
 class CreateNew : public QDialog
 {
     Q_OBJECT
@@ -22,15 +23,12 @@ protected slots:
     }
 
 signals:
-    void trans(QString day, QString time1, QString time2);
+    void trans(QString, QString, QString);
 
 private:
-
-    QLineEdit* time1;
     QLineEdit* day;
+    QLineEdit* time1;
     QLineEdit* time2;
-
-
 };
 
 #endif // CREATENEW_H

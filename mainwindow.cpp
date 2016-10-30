@@ -133,12 +133,19 @@ void MainWindow::open()
 
 void MainWindow::add(QString day, QString time1, QString time2)
 {
-//    QLabel *time_c = new QLabel(this);
-//    time_c->setGeometry(QRect(20,250,100,30));
-//    time_c->setText(day+time1+time2);
-    qDebug()<<day;
-    qDebug()<<time1;
-    qDebug()<<time2;
+    switch (day) {
+    case "Monday"||"monday":
+        QLabel *time_f = new QLabel(this);
+        time_f->setGeometry(QRect(20,250,100,30));
+        time_f->setText(day+time1+time2);
+        break;
+    default:
+        break;
+    }
+    QLabel *time_c = new QLabel(this);
+    time_c->setGeometry(QRect(20,250,100,30));
+    time_c->setText(day+time1+time2);
+
 }
 
 
