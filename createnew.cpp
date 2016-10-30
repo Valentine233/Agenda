@@ -34,9 +34,9 @@ void CreateNew::setinit()
     QPushButton *ok = new QPushButton ( "&OK", this);
     ok->setGeometry(400,400,80,40);
 
-    this->day = day->text();
-    this->time1 = time1->text();
-    this->time2 = time2->text();
+    this->day = day;
+    this->time1 = time1;
+    this->time2 = time2;
 
     QObject::connect(ok, SIGNAL(clicked(bool)), SLOT(send()));
 }
