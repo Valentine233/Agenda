@@ -16,6 +16,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     setWindowTitle(tr("Agenda"));
+    offset = 0;
     time();
     button();
     QObject::connect(ct, SIGNAL(trans(QString,QString,QString)), this, SLOT(add(QString,QString,QString)));
@@ -72,49 +73,57 @@ void MainWindow::time()
         label->setGeometry(QRect(0, 80+40*i, 50, 40));
     }
 
-    QLabel *label1 = new QLabel(this);
-    label1->setText("Monday");
-    label1->setAlignment(Qt::AlignCenter);
-    label1->setGeometry(QRect(50, 30, 100, 100));
-
-    QLabel *label2 = new QLabel(this);
-    label2->setText("Tuesday");
-    label2->setAlignment(Qt::AlignCenter);
-    label2->setGeometry(QRect(150, 30, 100, 100));
-
-    QLabel *label3 = new QLabel(this);
-    label3->setText("Wednesday");
-    label3->setAlignment(Qt::AlignCenter);
-    label3->setGeometry(QRect(250, 30, 100, 100));
-
-    QLabel *label4 = new QLabel(this);
-    label4->setText("Thursday");
-    label4->setAlignment(Qt::AlignCenter);
-    label4->setGeometry(QRect(350, 30, 100, 100));
-
-    QLabel *label5 = new QLabel(this);
-    label5->setText("Friday");
-    label5->setAlignment(Qt::AlignCenter);
-    label5->setGeometry(QRect(450, 30, 100, 100));
-
-    QLabel *label6 = new QLabel(this);
-    label6->setText("Saturday");
-    label6->setAlignment(Qt::AlignCenter);
-    label6->setGeometry(QRect(550, 30, 100, 100));
-
-    QLabel *label7 = new QLabel(this);
-    label7->setText("Sunday");
-    label7->setAlignment(Qt::AlignCenter);
-    label7->setGeometry(QRect(650, 30, 100, 100));
-
-    //add datetime
+    //add current time
     QLabel *label = new QLabel(this);
-    QDateTime curr_time = QDateTime::currentDateTime();
-    QString s = curr_time.toString(Qt::LocalDate);
-    label->setText(s);
+    QDateTime currTime = QDateTime::currentDateTime();
+    QString month = currTime.toLocalTime().toString("MMM");
+//    QString s = curr_time.toString(Qt::LocalDate);
+    label->setText(month);
     label->setAlignment(Qt::AlignCenter);
     label->setGeometry(QRect(2,20,150,50));
+//    QString weekStrings[7] = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
+    QString weekStrings[7] = {"周一", "周二", "周三", "周四", "周五", "周六", "周日"};
+    QLabel *weekLabels[7];
+    QLabel *dayLabels[7];
+    int currI = -1;
+    for (int i = 0; i<7; i++) {
+        // Week information
+        QLabel *weekLabel = new QLabel(this);
+        weekLabel->setText(weekStrings[i]);
+        weekLabel->setAlignment(Qt::AlignCenter);
+        weekLabel->setGeometry(QRect(i*100+50,30,100,100));
+        weekLabels[i] = weekLabel;
+        qDebug() << currTime.toString("ddd");
+        if (weekStrings[i] == currTime.toString("ddd")) {
+            currI = i;
+            QLabel * dayLabel = new QLabel(this);
+            dayLabel->setText(currTime.toString("d"));
+            dayLabel->setAlignment(Qt::AlignCenter);
+            dayLabel->setGeometry(QRect(i*100+50,40,100,100));
+            dayLabels[i] = dayLabel;
+            for (int j = 0;j<i;j++) {
+                qDebug() << currTime.addDays(-i+j).toString("d");
+                QLabel * dayLabel = new QLabel(this);
+                dayLabel->setText(currTime.addDays(-i+j).toString("d"));
+                dayLabel->setAlignment(Qt::AlignCenter);
+                dayLabel->setGeometry(QRect(j*100+50,40,100,100));
+                dayLabels[j] = dayLabel;
+            }
+            for (int j = 6; j>i;j--) {
+                qDebug() << j;
+                QLabel * dayLabel = new QLabel(this);
+                dayLabel->setText(currTime.addDays(j-i).toString("d"));
+                dayLabel->setAlignment(Qt::AlignCenter);
+                dayLabel->setGeometry(QRect(j*100+50,40,100,100));
+                dayLabels[j] = dayLabel;
+            }
+        }
 
+        // Day information
+
+
+
+    }
 }
 
 void MainWindow::button()
@@ -133,18 +142,18 @@ void MainWindow::open()
 
 void MainWindow::add(QString day, QString time1, QString time2)
 {
-    switch (day) {
-    case "Monday"||"monday":
-        QLabel *time_f = new QLabel(this);
-        time_f->setGeometry(QRect(20,250,100,30));
-        time_f->setText(day+time1+time2);
-        break;
-    default:
-        break;
-    }
-    QLabel *time_c = new QLabel(this);
-    time_c->setGeometry(QRect(20,250,100,30));
-    time_c->setText(day+time1+time2);
+//    switch (day) {
+//    case "Monday"||"monday":
+//        QLabel *time_f = new QLabel(this);
+//        time_f->setGeometry(QRect(20,250,100,30));
+//        time_f->setText(day+time1+time2);
+//        break;
+//    default:
+//        break;
+//    }
+//    QLabel *time_c = new QLabel(this);
+//    time_c->setGeometry(QRect(20,250,100,30));
+//    time_c->setText(day+time1+time2);
 
 }
 

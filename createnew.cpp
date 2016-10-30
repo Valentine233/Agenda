@@ -1,7 +1,5 @@
 #include "createnew.h"
-#include <QLabel>
-#include <QLineEdit>
-#include <QPushButton>
+
 
 CreateNew::CreateNew(QWidget* parent):QDialog(parent)
 {
@@ -10,6 +8,12 @@ CreateNew::CreateNew(QWidget* parent):QDialog(parent)
 
 void CreateNew::setinit()
 {
+
+    QDateTimeEdit* dateTime = new QDateTimeEdit(this);
+    dateTime->setDisplayFormat("yyyy.MM.dd");
+    dateTime->setCalendarPopup(true);
+    dateTime->setGeometry(QRect(100,100,100,30));
+
     QLabel *day_c = new QLabel(this);
     day_c->setGeometry(QRect(100, 200, 100, 30));
     day_c->setText("Day: ");
@@ -20,7 +24,6 @@ void CreateNew::setinit()
     QLabel *time_c = new QLabel(this);
     time_c->setGeometry(QRect(100,250,100,30));
     time_c->setText("Time: ");
-
 
     time1 = new QLineEdit(this);
     time1->setGeometry(200,250,100,30);
@@ -36,5 +39,6 @@ void CreateNew::setinit()
     confirmButton->setGeometry(400,400,80,40);
     confirmButton->setStyleSheet("QPushButton {color: black;}");
     QObject::connect(confirmButton, SIGNAL(clicked(bool)), SLOT(send()));
+
 }
 

@@ -22,6 +22,7 @@ public:
     void button();
     void setinit();
     CreateNew *ct = new CreateNew(this);
+    int offset;
 
 public slots:
     void open();
