@@ -60,7 +60,7 @@ void MainWindow::paintEvent(QPaintEvent *)
 
 }
 
-void MainWindow::time()
+void MainWindow::time(int offset)
 {
     int i;
     //add the vertical time zone
@@ -76,8 +76,8 @@ void MainWindow::time()
     //add current time
     QLabel *label = new QLabel(this);
     QDateTime currTime = QDateTime::currentDateTime();
-    QString month = currTime.toLocalTime().toString("MMM");
-//    QString s = curr_time.toString(Qt::LocalDate);
+    // Add month information
+    QString month = currTime.toLocalTime().addDays(7*offset).toString("MMM");
     label->setText(month);
     label->setAlignment(Qt::AlignCenter);
     label->setGeometry(QRect(2,20,150,50));
@@ -85,41 +85,25 @@ void MainWindow::time()
     QString weekStrings[7] = {"周一", "周二", "周三", "周四", "周五", "周六", "周日"};
     QLabel *weekLabels[7];
     QLabel *dayLabels[7];
-    int currI = -1;
     for (int i = 0; i<7; i++) {
         // Week information
         QLabel *weekLabel = new QLabel(this);
         weekLabel->setText(weekStrings[i]);
         weekLabel->setAlignment(Qt::AlignCenter);
-        weekLabel->setGeometry(QRect(i*100+50,30,100,100));
+        weekLabel->setGeometry(QRect(i*100+50,20,100,100));
         weekLabels[i] = weekLabel;
-        qDebug() << currTime.toString("ddd");
         if (weekStrings[i] == currTime.toString("ddd")) {
-            currI = i;
-            QLabel * dayLabel = new QLabel(this);
-            dayLabel->setText(currTime.toString("d"));
-            dayLabel->setAlignment(Qt::AlignCenter);
-            dayLabel->setGeometry(QRect(i*100+50,40,100,100));
-            dayLabels[i] = dayLabel;
-            for (int j = 0;j<i;j++) {
-                qDebug() << currTime.addDays(-i+j).toString("d");
+            // Day information
+            for (int j = 0;j<7;j++) {
                 QLabel * dayLabel = new QLabel(this);
                 dayLabel->setText(currTime.addDays(-i+j).toString("d"));
                 dayLabel->setAlignment(Qt::AlignCenter);
                 dayLabel->setGeometry(QRect(j*100+50,40,100,100));
                 dayLabels[j] = dayLabel;
             }
-            for (int j = 6; j>i;j--) {
-                qDebug() << j;
-                QLabel * dayLabel = new QLabel(this);
-                dayLabel->setText(currTime.addDays(j-i).toString("d"));
-                dayLabel->setAlignment(Qt::AlignCenter);
-                dayLabel->setGeometry(QRect(j*100+50,40,100,100));
-                dayLabels[j] = dayLabel;
-            }
         }
 
-        // Day information
+
 
 
 

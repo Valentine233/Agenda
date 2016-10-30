@@ -18,7 +18,7 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
     void paintEvent(QPaintEvent *);
-    void time();
+    void time(int time = 0);
     void button();
     void setinit();
     CreateNew *ct = new CreateNew(this);
