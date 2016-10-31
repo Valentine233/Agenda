@@ -18,15 +18,10 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
     void paintEvent(QPaintEvent *);
-<<<<<<< HEAD
-    void settime();
-=======
-    void time(int time = 0);
-    void button();
->>>>>>> 01e57b3acbb00a2d30f1e6901502bb593d092658
+    int offset;
+    void setTime(int offset);
     void setinit();
     CreateNew *ct = new CreateNew(this);
-    int offset;
 
 public slots:
     void open();
