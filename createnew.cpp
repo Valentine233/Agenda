@@ -2,6 +2,8 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QPushButton>
+#include <QComboBox>
+#include <QDateTimeEdit>
 
 CreateNew::CreateNew(QWidget* parent):QDialog(parent)
 {
@@ -16,6 +18,16 @@ void CreateNew::setinit()
 
     day = new QLineEdit(this);
     day->setGeometry(200,200,100,30);
+
+//    QComboBox *day = new QComboBox(this);
+//    day->setGeometry(200,200,100,30);
+//    day->addItem(QWidget::tr("Monday"));
+//    day->addItem(QWidget::tr("Tuesday"));
+//    day->addItem(QWidget::tr("Wednesday"));
+//    day->addItem(QWidget::tr("Thursday"));
+//    day->addItem(QWidget::tr("Friday"));
+//    day->addItem(QWidget::tr("Saturday"));
+//    day->addItem(QWidget::tr("Sunday"));
 
     QLabel *time_c = new QLabel(this);
     time_c->setGeometry(QRect(100,250,100,30));

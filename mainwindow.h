@@ -18,18 +18,22 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
     void paintEvent(QPaintEvent *);
-    void time();
-    void button();
+    void settime();
     void setinit();
     CreateNew *ct = new CreateNew(this);
 
 public slots:
     void open();
     void add(QString, QString, QString);
+    void forward();
+    void backwards();
+    void currenttime();
 
 private:
     Ui::MainWindow *ui;
-
+    QLabel *month = new QLabel(this);
+    QLabel *dayLabels[7];
+    QLabel *weekLabels[7];
 };
 
 #endif // MAINWINDOW_H
