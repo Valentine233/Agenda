@@ -1,6 +1,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include "event.h"
 #include "opennew.h"
 #include "createnew.h"
 #include "ui_mainwindow.h"
@@ -16,7 +17,6 @@
 #include <QDialog>
 #include <QMouseEvent>
 #include <QWidget>
-
 
 namespace Ui {
 class MainWindow;

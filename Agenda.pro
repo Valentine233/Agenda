@@ -16,10 +16,12 @@ TEMPLATE = app
 SOURCES += main.cpp\
         mainwindow.cpp \
     createnew.cpp \
-    opennew.cpp
+    opennew.cpp \
+    event.cpp
 
 HEADERS  += mainwindow.h \
     createnew.h \
-    opennew.h
+    opennew.h \
+    event.h
 
 FORMS    += mainwindow.ui
