@@ -1,10 +1,22 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include "opennew.h"
 #include "createnew.h"
+#include "ui_mainwindow.h"
 #include <QMainWindow>
 #include <QWidget>
 #include <QPushButton>
+#include <QPainter>
+#include <QVBoxLayout>
+#include <QLabel>
+#include <QString>
+#include <QDateTime>
+#include <QPushButton>
+#include <QDialog>
+#include <QMouseEvent>
+#include <QWidget>
+
 
 namespace Ui {
 class MainWindow;
@@ -18,15 +30,16 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
     void paintEvent(QPaintEvent *);
-<<<<<<< HEAD
-    void settime();
-=======
-    void time(int time = 0);
-    void button();
->>>>>>> 01e57b3acbb00a2d30f1e6901502bb593d092658
+    //void settime();
     void setinit();
+    void time(int time = 0);
+    //void button();
     CreateNew *ct = new CreateNew(this);
     int offset;
+    void mouseDoubleClickEvent(QMouseEvent *event);
+
+signals:
+    void openNewSignal(QMouseEvent *);
 
 public slots:
     void open();
@@ -34,6 +47,7 @@ public slots:
     void forward();
     void backwards();
     void currenttime();
+    void openNew(QMouseEvent *event);
 
 private:
     Ui::MainWindow *ui;

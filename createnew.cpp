@@ -1,13 +1,4 @@
 #include "createnew.h"
-<<<<<<< HEAD
-#include <QLabel>
-#include <QLineEdit>
-#include <QPushButton>
-#include <QComboBox>
-#include <QDateTimeEdit>
-=======
-
->>>>>>> 01e57b3acbb00a2d30f1e6901502bb593d092658
 
 CreateNew::CreateNew(QWidget* parent):QDialog(parent)
 {

@@ -2,12 +2,13 @@
 #define CREATENEW_H
 
 #include <QDialog>
-#include<QWidget>
+#include <QWidget>
 #include <QDebug>
 #include <QLabel>
 #include <QLineEdit>
 #include <QPushButton>
 #include <QDateTimeEdit>
+
 class CreateNew : public QDialog
 {
     Q_OBJECT
