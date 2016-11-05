@@ -1,19 +1,10 @@
 #include "mainwindow.h"
-#include "ui_mainwindow.h"
-#include <QPainter>
-#include <QVBoxLayout>
-#include <QLabel>
-#include <QString>
-#include <QDateTime>
-#include <QPushButton>
-#include <QDialog>
-#include <createnew.h>
-#include <QtDebug>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
+
     ui->setupUi(this);
     setinit();
     setWindowTitle(tr("Agenda"));
@@ -21,6 +12,9 @@ MainWindow::MainWindow(QWidget *parent) :
     offset = 0;
     setTime(offset);
     QObject::connect(ct, SIGNAL(trans(QString,QString,QString)), this, SLOT(add(QString,QString,QString)));
+    connect(this, SIGNAL(openNewSignal(QMouseEvent*)), this, SLOT(openNew(QMouseEvent*)));
+
+
 }
 
 MainWindow::~MainWindow()
@@ -111,6 +105,7 @@ void MainWindow::setTime(int _offset)
     }
 }
 
+
 void MainWindow::setinit()
 {
     QPushButton *create = new QPushButton ( "&Create", this);
@@ -127,8 +122,7 @@ void MainWindow::setinit()
     connect(backwards_button, SIGNAL(clicked(bool)), this, SLOT(backwards()));
     // back to the current week
     QPushButton *current = new QPushButton ( "&Today", this);
-    current->setGeometry(70,20,65,50);
-//    current->raise();
+    current->setGeometry(QRect(80,25,65,30));
     connect(current, SIGNAL(clicked(bool)), this, SLOT(currenttime()));
 
     int i;
@@ -185,6 +179,21 @@ void MainWindow::add(QString day, QString time1, QString time2)
     time_c->setText(day+time1+time2);
 }
 
+void MainWindow::mouseDoubleClickEvent(QMouseEvent *event)
+{
+    if( event->buttons() == Qt::LeftButton)
+    {
+        emit openNewSignal(event);
+    }
+}
+
+void MainWindow::openNew(QMouseEvent *event)
+{
+    OpenNew opennew(this);
+    opennew.setGeometry(event->globalX(),event->globalY(),400,240);
+    opennew.setinit();
+    opennew.exec();
+}
 
 
 
