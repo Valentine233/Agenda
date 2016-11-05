@@ -30,12 +30,10 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
     void paintEvent(QPaintEvent *);
-    //void settime();
-    void setinit();
-    void time(int time = 0);
-    //void button();
-    CreateNew *ct = new CreateNew(this);
     int offset;
+    void setTime(int offset);
+    void setinit();
+    CreateNew *ct = new CreateNew(this);
     void mouseDoubleClickEvent(QMouseEvent *event);
 
 signals:
