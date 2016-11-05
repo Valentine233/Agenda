@@ -35,6 +35,7 @@ private:
     QLabel *month = new QLabel(this);
     QLabel *dayLabels[7];
     QLabel *weekLabels[7];
+    void setWindowStyle();
 };
 
 #endif // MAINWINDOW_H

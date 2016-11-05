@@ -17,15 +17,20 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     setinit();
     setWindowTitle(tr("Agenda"));
+    setWindowStyle();
     offset = 0;
     setTime(offset);
     QObject::connect(ct, SIGNAL(trans(QString,QString,QString)), this, SLOT(add(QString,QString,QString)));
-
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::setWindowStyle() {
+    this->setStyleSheet("MainWindow {background-color:#fff;} QLabel {color:#888;}");
+
 }
 
 void MainWindow::paintEvent(QPaintEvent *)
@@ -48,13 +53,13 @@ void MainWindow::paintEvent(QPaintEvent *)
         divide[i] = QLine(100+100*i,100,100+100*i,580);
     }
 
-    painter.setPen(Qt::gray);
+    painter.setPen(QColor("#ccc"));
     painter.drawLines(hlines, 13);
     painter.drawLines(vlines, 8);
 
     QPen pen;
     pen.setStyle(Qt::DotLine);
-    pen.setBrush(Qt::lightGray);
+    pen.setBrush(QColor("#eee"));
     painter.setPen(pen);
     painter.drawLines(divide, 7);
 
@@ -132,7 +137,7 @@ void MainWindow::setinit()
     {
         QString s = QString::number(2*i);
         QLabel *label = new QLabel(this);
-        label->setText(s+":00");
+        label->setText(s);
         label->setAlignment(Qt::AlignCenter);
         label->setGeometry(QRect(0, 80+40*i, 50, 40));
     }
