@@ -1,26 +1,29 @@
 #ifndef EVENT_H
 #define EVENT_H
 
+#include "mainwindow.h"
 #include <QString>
 #include <QDateTime>
-#include <QFile>
-#include <QTextStream>
+#include <QList>
+#include <QWidget>
 
-QFile MyEventList("/Users/liaoxuan/QtProjet/Agenda/MyEventList.txt");
-QFile YourEventList("/Users/liaoxuan/QtProjet/Agenda/YourEventList.txt");
-QTextStream MyEvent(&MyEventList);
-QTextStream YourEvent(&YourEventList);
-
-class Event
+class Event : public QWidget
 {
 public:
-    Event(QString name, QString place, QDateTime starttime, QDateTime endtime);
+    friend class MainWindow;
+    Event(QString name, QString place, QDateTime starttime, QDateTime endtime, int type);
+    //static QList<Event>* mylist;
+    //static QList<Event>* yourlist;
+    void paintEvent(QPaintEvent *);
 
 private:
     QString eventName;
     QString eventPlace;
-    QDateTime eventStarttime;
-    QDateTime eventEndtime;
+    QDateTime eventStart;
+    QDateTime eventEnd;
+    //QString eventStart;
+    //QString eventEnd;
+    int eventType;
 };
 
 #endif // EVENT_H

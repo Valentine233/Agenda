@@ -1,18 +1,22 @@
 #include "mainwindow.h"
 
+QFile MyEventList("/Users/liaoxuan/QtProjet/Agenda/MyEventList.txt");
+QFile YourEventList("/Users/liaoxuan/QtProjet/Agenda/YourEventList.txt");
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
-
+    QTextStream MyEvent(&MyEventList);
+    QTextStream YourEvent(&YourEventList);
     ui->setupUi(this);
     setinit();
     setWindowTitle(tr("Agenda"));
     offset = 0;
     setTime(offset);
     QObject::connect(ct, SIGNAL(trans(QString,QString,QString)), this, SLOT(add(QString,QString,QString)));
-    connect(this, SIGNAL(openNewSignal(QMouseEvent*)), this, SLOT(openNew(QMouseEvent*)));
-
+    QObject::connect(this, SIGNAL(openNewSignal(QMouseEvent*)), this, SLOT(openNew(QMouseEvent*)));
+    addTest();
 }
 
 MainWindow::~MainWindow()
@@ -22,7 +26,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::paintEvent(QPaintEvent *)
 {
-    QPainter painter(this);
+    QPainter *painter = new QPainter(this);
     int i;
     QLine hlines[13];
     for(i=0; i<13; i++)
@@ -40,17 +44,24 @@ void MainWindow::paintEvent(QPaintEvent *)
         divide[i] = QLine(100+100*i,100,100+100*i,580);
     }
 
-    painter.setPen(Qt::gray);
-    painter.drawLines(hlines, 13);
-    painter.drawLines(vlines, 8);
+    painter->setPen(Qt::gray);
+    painter->drawLines(hlines, 13);
+    painter->drawLines(vlines, 8);
 
     QPen pen;
     pen.setStyle(Qt::DotLine);
     pen.setBrush(Qt::lightGray);
-    painter.setPen(pen);
-    painter.drawLines(divide, 7);
+    painter->setPen(pen);
+    painter->drawLines(divide, 7);
 
+    //QObject::connect(this, SIGNAL(updateEvent(int,int,int,int)), this, SLOT(painter->drawRect(int,int,int,int)));
 }
+
+//void MainWindow::drawRec(int x,int y,int w,int h)
+//{
+//    painter->drawRect(50+100*j,100+480*startminute/(24*60),50+type*50,480*(endminute-startminute)/(24*60));
+//}
+
 
 void MainWindow::setTime(int _offset)
 {
@@ -69,9 +80,10 @@ void MainWindow::setTime(int _offset)
         weekLabel->setGeometry(QRect(77+100*i, 45, 40, 30));
         if( weekStrings[i] == curr_time.toString("ddd") )
         {
+            QPalette pe_defalt;
+            pe_defalt.setColor(QPalette::WindowText,Qt::black);
             QPalette pe;
             pe.setColor(QPalette::WindowText,Qt::red);
-//            weekLabels[i]->setPalette(pe);
 
             //month information
             month->setText(curr_time.addDays(-i).toString("M"));
@@ -85,12 +97,12 @@ void MainWindow::setTime(int _offset)
                 dayLabel->setAlignment(Qt::AlignCenter);
                 dayLabel->setGeometry(QRect(77+100*j, 70, 40, 15));
                 if (j==i && offset!=0) {
-                    QPalette pe_defalt;
-                    pe_defalt.setColor(QPalette::WindowText,Qt::black);
                     dayLabel->setPalette(pe_defalt);
+                    weekLabel->setPalette(pe_defalt);
                 }
                 if(j==i && offset == 0) {
                     dayLabel->setPalette(pe);
+                    weekLabel->setPalette(pe);
                 }
 
             }
@@ -142,7 +154,6 @@ void MainWindow::setinit()
     }
 }
 
-
 void MainWindow::forward()
 {
     setTime(offset+1);
@@ -188,8 +199,14 @@ void MainWindow::openNew(QMouseEvent *event)
     opennew.exec();
 }
 
+void MainWindow::addTest()
+{
+    QString name = "sleep";
+    QString place = "bed";
+    QDateTime starttime(QDate(2016,12,12), QTime(11,11,11));
+    QDateTime endtime(QDate(2016,12,12), QTime(12,12,12));
+    Event *event = new Event(name, place, starttime, endtime, 0);
 
-
-
+}
 
 

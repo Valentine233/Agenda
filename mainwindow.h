@@ -17,6 +17,10 @@
 #include <QDialog>
 #include <QMouseEvent>
 #include <QWidget>
+#include <QPixmap>
+#include <QFile>
+#include <QTextStream>
+
 
 namespace Ui {
 class MainWindow;
@@ -35,11 +39,17 @@ public:
     void setinit();
     CreateNew *ct = new CreateNew(this);
     void mouseDoubleClickEvent(QMouseEvent *event);
+    static QTextStream MyEvent;
+    static QTextStream YourEvent;
+    void addTest();
+
 
 signals:
     void openNewSignal(QMouseEvent *);
+    //void updateEvent(int, int, int, int);
 
 public slots:
+    //void update(int,int,int,int);
     void open();
     void add(QString, QString, QString);
     void forward();

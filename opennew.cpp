@@ -1,5 +1,9 @@
 #include "opennew.h"
 
+//QList<Event>* Event::mylist;
+//QList<Event>* Event::yourlist;
+
+
 OpenNew::OpenNew(QWidget* parent):QDialog(parent)
 {
     setWindowTitle("New");
@@ -11,14 +15,12 @@ void OpenNew::setinit()
     name->setText("事件名称：");
     name->setGeometry(QRect(20,10,60,20));
 
-    QLineEdit* nameinput = new QLineEdit(this);
     nameinput->setGeometry(QRect(100,10,100,20));
 
     QLabel* place = new QLabel(this);
     place->setText("事件地点：");
     place->setGeometry(QRect(20,40,60,20));
 
-    QLineEdit* placeinput = new QLineEdit(this);
     placeinput->setGeometry(QRect(100,40,100,20));
 
     QLabel* time = new QLabel(this);
@@ -100,6 +102,8 @@ void OpenNew::setinit()
     addButton->setStyleSheet("QPushButton {color: black;}");
 
     QObject::connect(timechoise, SIGNAL(buttonPressed(int)), this, SLOT(TimeChoose(int)));
+    QObject::connect(addButton, SIGNAL(clicked(bool)), this, SLOT(send()));
+    QObject::connect(this, SIGNAL(trans(QString, QString, QDateTime, QDateTime, int)), this, SLOT(addNewEvent(QString, QString, QDateTime, QDateTime, int)));
 
 }
 
@@ -126,5 +130,22 @@ void OpenNew::TimeChoose(int id)
     }
 
 }
+
+//void OpenNew::addNewEvent(QString name, QString place, QDateTime starttime, QDateTime endtime, int type)
+//{
+//    Event *event = new Event(name, place, starttime, endtime, type);
+//    Event::mylist->append(*event);
+//    DB::query.exec("select * from myevent where name = sleep");
+//    if (DB::query.next())
+//    {
+//         qDebug()<< DB::query.value(0).toInt()<<"\n";
+//         qDebug()<< DB::query.value(1).toString()<<"\n";
+//         qDebug()<< DB::query.value(2).toString()<<"\n";
+//         qDebug()<< DB::query.value(3).toDateTime()<<"\n";
+//         qDebug()<< DB::query.value(4).toDateTime()<<"\n";
+//         qDebug()<< DB::query.value(5).toInt()<<"\n";
+//     }
+
+//}
 
 
