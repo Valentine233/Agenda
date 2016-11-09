@@ -35,7 +35,6 @@ public:
     void setinit();
     CreateNew *ct = new CreateNew(this);
     void mouseDoubleClickEvent(QMouseEvent *event);
-
 signals:
     void openNewSignal(QMouseEvent *);
 

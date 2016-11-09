@@ -3,13 +3,7 @@
 
 #include <QString>
 #include <QDateTime>
-#include <QFile>
-#include <QTextStream>
 
-QFile MyEventList("/Users/liaoxuan/QtProjet/Agenda/MyEventList.txt");
-QFile YourEventList("/Users/liaoxuan/QtProjet/Agenda/YourEventList.txt");
-QTextStream MyEvent(&MyEventList);
-QTextStream YourEvent(&YourEventList);
 
 class Event
 {
