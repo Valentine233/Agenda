@@ -1,22 +1,16 @@
 #ifndef EVENT_H
 #define EVENT_H
 
-#include "mainwindow.h"
 #include <QString>
 #include <QDateTime>
-#include <QList>
 #include <QWidget>
+//#include <QGraphicsItem>
 
 class Event : public QWidget
 {
 public:
-    friend class MainWindow;
-    Event(QString name, QString place, QDateTime starttime, QDateTime endtime, int type);
-    //static QList<Event>* mylist;
-    //static QList<Event>* yourlist;
-    void paintEvent(QPaintEvent *);
-
-private:
+    Event(QString name, QString place, QDateTime starttime, QDateTime endtime, int type,
+          QWidget *parent);
     QString eventName;
     QString eventPlace;
     QDateTime eventStart;

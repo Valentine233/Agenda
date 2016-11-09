@@ -103,7 +103,8 @@ void OpenNew::setinit()
 
     QObject::connect(timechoise, SIGNAL(buttonPressed(int)), this, SLOT(TimeChoose(int)));
     QObject::connect(addButton, SIGNAL(clicked(bool)), this, SLOT(send()));
-    QObject::connect(this, SIGNAL(trans(QString, QString, QDateTime, QDateTime, int)), this, SLOT(addNewEvent(QString, QString, QDateTime, QDateTime, int)));
+    QObject::connect(this, SIGNAL(trans(QString, QString, QDateTime, QDateTime, int)), this->parent(), SLOT(addtoEventList(QString, QString, QDateTime, QDateTime, int)));
+    QObject::connect(this, SIGNAL(trans(QString, QString, QDateTime, QDateTime, int)), this, SLOT(close()));
 
 }
 
@@ -133,6 +134,7 @@ void OpenNew::TimeChoose(int id)
 
 //void OpenNew::addNewEvent(QString name, QString place, QDateTime starttime, QDateTime endtime, int type)
 //{
+
 //    Event *event = new Event(name, place, starttime, endtime, type);
 //    Event::mylist->append(*event);
 //    DB::query.exec("select * from myevent where name = sleep");

@@ -16,7 +16,6 @@ MainWindow::MainWindow(QWidget *parent) :
     setTime(offset);
     QObject::connect(ct, SIGNAL(trans(QString,QString,QString)), this, SLOT(add(QString,QString,QString)));
     QObject::connect(this, SIGNAL(openNewSignal(QMouseEvent*)), this, SLOT(openNew(QMouseEvent*)));
-    addTest();
 }
 
 MainWindow::~MainWindow()
@@ -27,6 +26,7 @@ MainWindow::~MainWindow()
 void MainWindow::paintEvent(QPaintEvent *)
 {
     QPainter *painter = new QPainter(this);
+
     int i;
     QLine hlines[13];
     for(i=0; i<13; i++)
@@ -54,22 +54,57 @@ void MainWindow::paintEvent(QPaintEvent *)
     painter->setPen(pen);
     painter->drawLines(divide, 7);
 
-    //QObject::connect(this, SIGNAL(updateEvent(int,int,int,int)), this, SLOT(painter->drawRect(int,int,int,int)));
+    painter->end();
 }
 
-//void MainWindow::drawRec(int x,int y,int w,int h)
-//{
-//    painter->drawRect(50+100*j,100+480*startminute/(24*60),50+type*50,480*(endminute-startminute)/(24*60));
-//}
+void MainWindow::addEventUI(Event *event)
+{
+    QString weekStrings[7] = {"周一","周二","周三","周四","周五","周六","周日"};
+    QString weekStart = event->eventStart.toString("ddd");
 
+    int startminute = 60*event->eventStart.toString("HH").toInt() + event->eventStart.toString("mm").toInt();
+    int endminute = 60*event->eventEnd.toString("HH").toInt() + event->eventEnd.toString("mm").toInt();
+
+    for(int j=0; j<7; j++)
+    {
+        if(weekStart == weekStrings[j])
+        {
+
+            QLabel *eventRect = new QLabel(this);
+            eventRect->setGeometry(50+100*j,100+480*startminute/(24*60),50+event->eventType*50,480*(endminute-startminute)/(24*60));
+            eventRect->setStyleSheet("background-color: rgba(34, 24, 245, 50);");
+            eventRect->setText(event->eventName+"\n"+event->eventPlace);
+            eventRect->setAlignment(Qt::AlignCenter);
+            eventRect->show();
+        }
+    }
+}
 
 void MainWindow::setTime(int _offset)
 {
     offset = _offset;
     // 是当前时间 + week的偏移量的结果
-    QDateTime curr_time = QDateTime::currentDateTime().addDays(7*offset);
+    curr_time = QDateTime::currentDateTime().addDays(7*offset);
     // QString weekStrings[7] = {"Mon","Tue","Wed","Thu","Fri","Sat","Sun"};
     QString weekStrings[7] = {"周一","周二","周三","周四","周五","周六","周日"};
+    QString weekCurr = curr_time.toString("ddd");
+
+    //add EventUI
+    int i;
+    //QList<Event> *list = mylist;
+    QList<Event>::Iterator e;
+    for(e=mylist->begin(); e!=mylist->end(); e++)
+    {
+        for(i=0; i<7; i++)
+        {
+            if(weekCurr == weekStrings[i])
+                break;
+        }
+        if(e->eventStart.date()>=curr_time.addDays(-i).date() && e->eventStart.date()<=curr_time.addDays(6-i).date()) //event is in this week
+        {
+            addEventUI(e);
+        }
+    }
 
     //week information
     for(int i=0; i<7; i++)
@@ -199,14 +234,41 @@ void MainWindow::openNew(QMouseEvent *event)
     opennew.exec();
 }
 
-void MainWindow::addTest()
+void MainWindow::turnToEventTime(Event *event)
 {
-    QString name = "sleep";
-    QString place = "bed";
-    QDateTime starttime(QDate(2016,12,12), QTime(11,11,11));
-    QDateTime endtime(QDate(2016,12,12), QTime(12,12,12));
-    Event *event = new Event(name, place, starttime, endtime, 0);
+    int i;
+    QString weekStrings[7] = {"周一","周二","周三","周四","周五","周六","周日"};
+    QString weekCurr = curr_time.toString("ddd");
 
+
+    for(i=0; i<7; i++)
+    {
+        if(weekCurr == weekStrings[i])
+            break;
+    }
+    if(event->eventStart.date()<curr_time.addDays(-i).date()) //previous date
+    {
+        backwards();
+        while(event->eventStart.date()<curr_time.addDays(-i).date())
+        {
+            backwards();
+        }
+    }
+    else if(event->eventStart.date()>curr_time.addDays(6-i).date()) //following date
+    {
+        forward();
+        while(event->eventStart.date()>curr_time.addDays(6-i).date())
+        {
+            forward();
+        }
+    }
 }
 
+void MainWindow::addtoEventList(QString name, QString place, QDateTime starttime, QDateTime endtime, int type)
+{
+    Event *event = new Event(name,place,starttime,endtime,type,this);
+    mylist->append(*event);
 
+    turnToEventTime(event);
+    addEventUI(event);
+}

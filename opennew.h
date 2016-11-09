@@ -20,7 +20,7 @@ class OpenNew : public QDialog
     Q_OBJECT
 
 public:
-    OpenNew(QWidget* parent=nullptr);
+    OpenNew(QWidget *parent);
     void setinit();
 
 signals:
@@ -31,7 +31,10 @@ public slots:
     //void addNewEvent(QString, QString, QDateTime, QDateTime, int);
     void send() //myevent: type = 0,   yourevent: type = 1
     {
-        emit trans(nameinput->text(), placeinput->text(), starttime->dateTime(), endtime->dateTime(), 0);
+        QDateTime start(dateEdit->date(), starttime->dateTime().time());
+        QDateTime end(dateEdit->date(), endtime->dateTime().time());
+
+        emit trans(nameinput->text(), placeinput->text(), start, end, 0);
     }
 
 private:
