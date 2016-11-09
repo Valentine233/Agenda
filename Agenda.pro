@@ -27,3 +27,5 @@ HEADERS  += mainwindow.h \
     db.h
 
 FORMS    += mainwindow.ui
+
+QT += sql

@@ -3,18 +3,21 @@
 
 #include <QString>
 #include <QDateTime>
+#include <QWidget>
+//#include <QGraphicsItem>
 
-
-class Event
+class Event : public QWidget
 {
 public:
-    Event(QString name, QString place, QDateTime starttime, QDateTime endtime);
-
-private:
+    Event(QString name, QString place, QDateTime starttime, QDateTime endtime, int type,
+          QWidget *parent);
     QString eventName;
     QString eventPlace;
-    QDateTime eventStarttime;
-    QDateTime eventEndtime;
+    QDateTime eventStart;
+    QDateTime eventEnd;
+    //QString eventStart;
+    //QString eventEnd;
+    int eventType;
 };
 
 #endif // EVENT_H

@@ -1,10 +1,14 @@
 #include "mainwindow.h"
-#include <QTextStream>
+
+QFile MyEventList("/Users/liaoxuan/QtProjet/Agenda/MyEventList.txt");
+QFile YourEventList("/Users/liaoxuan/QtProjet/Agenda/YourEventList.txt");
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
-
+    QTextStream MyEvent(&MyEventList);
+    QTextStream YourEvent(&YourEventList);
     ui->setupUi(this);
     setinit();
     setWindowTitle(tr("Agenda"));
@@ -12,8 +16,7 @@ MainWindow::MainWindow(QWidget *parent) :
     offset = 0;
     setTime(offset);
     QObject::connect(ct, SIGNAL(trans(QString,QString,QString)), this, SLOT(add(QString,QString,QString)));
-    connect(this, SIGNAL(openNewSignal(QMouseEvent*)), this, SLOT(openNew(QMouseEvent*)));
-
+    QObject::connect(this, SIGNAL(openNewSignal(QMouseEvent*)), this, SLOT(openNew(QMouseEvent*)));
 
 }
 
@@ -29,7 +32,8 @@ void MainWindow::setWindowStyle() {
 
 void MainWindow::paintEvent(QPaintEvent *)
 {
-    QPainter painter(this);
+    QPainter *painter = new QPainter(this);
+
     int i;
     QLine hlines[13];
     for(i=0; i<13; i++)
@@ -47,25 +51,67 @@ void MainWindow::paintEvent(QPaintEvent *)
         divide[i] = QLine(100+100*i,100,100+100*i,580);
     }
 
-    painter.setPen(QColor("#ccc"));
-    painter.drawLines(hlines, 13);
-    painter.drawLines(vlines, 8);
+
+    painter->setPen(Qt::gray);
+    painter->drawLines(hlines, 13);
+    painter->drawLines(vlines, 8);
 
     QPen pen;
     pen.setStyle(Qt::DotLine);
-    pen.setBrush(QColor("#eee"));
-    painter.setPen(pen);
-    painter.drawLines(divide, 7);
+    pen.setBrush(Qt::lightGray);
+    painter->setPen(pen);
+    painter->drawLines(divide, 7);
+    painter->end();
+}
 
+void MainWindow::addEventUI(Event *event)
+{
+    QString weekStrings[7] = {"周一","周二","周三","周四","周五","周六","周日"};
+    QString weekStart = event->eventStart.toString("ddd");
+
+    int startminute = 60*event->eventStart.toString("HH").toInt() + event->eventStart.toString("mm").toInt();
+    int endminute = 60*event->eventEnd.toString("HH").toInt() + event->eventEnd.toString("mm").toInt();
+
+    for(int j=0; j<7; j++)
+    {
+        if(weekStart == weekStrings[j])
+        {
+
+            QLabel *eventRect = new QLabel(this);
+            eventRect->setGeometry(50+100*j,100+480*startminute/(24*60),50+event->eventType*50,480*(endminute-startminute)/(24*60));
+            eventRect->setStyleSheet("background-color: rgba(34, 24, 245, 50);");
+            eventRect->setText(event->eventName+"\n"+event->eventPlace);
+            eventRect->setAlignment(Qt::AlignCenter);
+            eventRect->show();
+        }
+    }
 }
 
 void MainWindow::setTime(int _offset)
 {
     offset = _offset;
     // 是当前时间 + week的偏移量的结果
-    QDateTime curr_time = QDateTime::currentDateTime().addDays(7*offset);
+    curr_time = QDateTime::currentDateTime().addDays(7*offset);
     // QString weekStrings[7] = {"Mon","Tue","Wed","Thu","Fri","Sat","Sun"};
     QString weekStrings[7] = {"周一","周二","周三","周四","周五","周六","周日"};
+    QString weekCurr = curr_time.toString("ddd");
+
+    //add EventUI
+    int i;
+    //QList<Event> *list = mylist;
+    QList<Event>::Iterator e;
+    for(e=mylist->begin(); e!=mylist->end(); e++)
+    {
+        for(i=0; i<7; i++)
+        {
+            if(weekCurr == weekStrings[i])
+                break;
+        }
+        if(e->eventStart.date()>=curr_time.addDays(-i).date() && e->eventStart.date()<=curr_time.addDays(6-i).date()) //event is in this week
+        {
+            addEventUI(e);
+        }
+    }
 
     //week information
     for(int i=0; i<7; i++)
@@ -76,9 +122,10 @@ void MainWindow::setTime(int _offset)
         weekLabel->setGeometry(QRect(77+100*i, 45, 40, 30));
         if( weekStrings[i] == curr_time.toString("ddd") )
         {
+            QPalette pe_defalt;
+            pe_defalt.setColor(QPalette::WindowText,Qt::black);
             QPalette pe;
             pe.setColor(QPalette::WindowText,Qt::red);
-//            weekLabels[i]->setPalette(pe);
 
             //month information
             month->setText(curr_time.addDays(-i).toString("M"));
@@ -92,12 +139,12 @@ void MainWindow::setTime(int _offset)
                 dayLabel->setAlignment(Qt::AlignCenter);
                 dayLabel->setGeometry(QRect(77+100*j, 70, 40, 15));
                 if (j==i && offset!=0) {
-                    QPalette pe_defalt;
-                    pe_defalt.setColor(QPalette::WindowText,Qt::black);
                     dayLabel->setPalette(pe_defalt);
+                    weekLabel->setPalette(pe_defalt);
                 }
                 if(j==i && offset == 0) {
                     dayLabel->setPalette(pe);
+                    weekLabel->setPalette(pe);
                 }
 
             }
@@ -149,7 +196,6 @@ void MainWindow::setinit()
     }
 }
 
-
 void MainWindow::forward()
 {
     setTime(offset+1);
@@ -195,8 +241,41 @@ void MainWindow::openNew(QMouseEvent *event)
     opennew.exec();
 }
 
+void MainWindow::turnToEventTime(Event *event)
+{
+    int i;
+    QString weekStrings[7] = {"周一","周二","周三","周四","周五","周六","周日"};
+    QString weekCurr = curr_time.toString("ddd");
 
 
+    for(i=0; i<7; i++)
+    {
+        if(weekCurr == weekStrings[i])
+            break;
+    }
+    if(event->eventStart.date()<curr_time.addDays(-i).date()) //previous date
+    {
+        backwards();
+        while(event->eventStart.date()<curr_time.addDays(-i).date())
+        {
+            backwards();
+        }
+    }
+    else if(event->eventStart.date()>curr_time.addDays(6-i).date()) //following date
+    {
+        forward();
+        while(event->eventStart.date()>curr_time.addDays(6-i).date())
+        {
+            forward();
+        }
+    }
+}
 
+void MainWindow::addtoEventList(QString name, QString place, QDateTime starttime, QDateTime endtime, int type)
+{
+    Event *event = new Event(name,place,starttime,endtime,type,this);
+    mylist->append(*event);
 
-
+    turnToEventTime(event);
+    addEventUI(event);
+}
