@@ -14,6 +14,7 @@
 #include <QPushButton>
 #include <QCheckBox>
 #include <QList>
+#include <mainwindow.h>
 
 class OpenNew : public QDialog
 {
@@ -21,7 +22,7 @@ class OpenNew : public QDialog
 
 public:
     OpenNew(QWidget *parent);
-    void setinit();
+    void setInit(int, int);
 
 signals:
     void trans(QString, QString, QDateTime, QDateTime, int);
@@ -29,26 +30,23 @@ signals:
 public slots:
     void TimeChoose(int id);
     //void addNewEvent(QString, QString, QDateTime, QDateTime, int);
-    void send() //myevent: type = 0,   yourevent: type = 1
-    {
-        QDateTime start(dateEdit->date(), starttime->dateTime().time());
-        QDateTime end(dateEdit->date(), endtime->dateTime().time());
-
-        emit trans(nameinput->text(), placeinput->text(), start, end, 0);
-    }
+    void send();
+    void deleteTemp();
 
 private:
     QLineEdit* nameinput = new QLineEdit(this);
     QLineEdit* placeinput = new QLineEdit(this);
 
     QDateTimeEdit *dateEdit = new QDateTimeEdit(QDate::currentDate(),this);
-    QDateTimeEdit *starttime = new QDateTimeEdit(QTime::currentTime(),this);
-    QDateTimeEdit *endtime = new QDateTimeEdit(QTime::currentTime(),this);
+    QTimeEdit *starttime = new QTimeEdit(QTime::currentTime(),this);
+    QTimeEdit *endtime = new QTimeEdit(QTime::currentTime(),this);
 
     QDateTimeEdit *startdate = new QDateTimeEdit(QDate::currentDate(),this);
     QDateTimeEdit *enddate = new QDateTimeEdit(QDate::currentDate(),this);
     QLabel* start1 = new QLabel(this);
     QLabel* end1 = new QLabel(this);
+protected:
+    void closeEvent(QCloseEvent *event);
 };
 
 #endif // OPENNEW_H

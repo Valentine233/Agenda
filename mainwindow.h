@@ -42,12 +42,18 @@ public:
     void setinit();
     CreateNew *ct = new CreateNew(this);
     void mouseDoubleClickEvent(QMouseEvent *);
-    static QTextStream MyEvent;
-    static QTextStream YourEvent;
-    static QList<Event> *mylist;
-    static QList<Event> *yourlist;
+    QTextStream MyEvent;
+    QTextStream YourEvent;
+    QList<Event*>* mylist;
+    QList<Event*>* yourlist;
     void turnToEventTime(Event *);
-
+    QLabel* tempUI = NULL;
+    const static int leftX = 50;
+    const static int topY = 100;
+    const static int gridHight = 40;
+    const static int gridWidth = 50;
+    const static int rightX = leftX + 14 * gridWidth;
+    const static int bottomY = topY + 12 * gridHight;
 signals:
     void openNewSignal(QMouseEvent *);
     //void updateEvent(int, int, int, int);
@@ -58,10 +64,10 @@ public slots:
     void add(QString, QString, QString);
     void forward();
     void backwards();
-    void currenttime();
+    void currentTime();
     void openNew(QMouseEvent *);
-    void addtoEventList(QString, QString, QDateTime, QDateTime, int);
-    void addEventUI(Event *);
+    void addToEventList(QString, QString, QDateTime, QDateTime, int);
+    QLabel* addEventUI(Event *);
 
 private:
     Ui::MainWindow *ui;

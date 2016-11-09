@@ -1,13 +1,11 @@
 #include "db.h"
 
-QSqlQuery DB::query;
 
 DB::DB()
 {
-    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
+    db = QSqlDatabase::addDatabase("QSQLITE");
     db.setDatabaseName("/tmp/my.db");
     db.open();
-    QSqlQuery query;
     query = QSqlQuery(db);
     query.exec("CREATE TABLE IF NOT EXISTS myevent (id INTEGER PRIMARY KEY AUTOINCREMENT,"
                "name NVARCHAR(20) NOT NULL,"

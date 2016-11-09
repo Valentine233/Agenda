@@ -18,6 +18,9 @@ public:
     //QString eventStart;
     //QString eventEnd;
     int eventType;
+
+    // in minute
+    static int defaultDuration;
 };
 
 #endif // EVENT_H

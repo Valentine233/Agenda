@@ -9,8 +9,20 @@ OpenNew::OpenNew(QWidget* parent):QDialog(parent)
     setWindowTitle("New");
 }
 
-void OpenNew::setinit()
+void OpenNew::setInit(int x, int y)
 {
+    //qDebug() << x << y;
+    // y 5 for 15 min, 20 for 1 hour， a grid is 40 - 2 hours
+    QTime* eventStartTime = new QTime((y- MainWindow::topY)/(MainWindow::gridHight/2), (y- MainWindow::topY)%(MainWindow::gridHight/2)/((MainWindow::gridHight/4))*30);
+    QString weekStrings[7] = {"周一","周二","周三","周四","周五","周六","周日"};
+    QString currDay = QDate::currentDate().toString("ddd");
+    int d;
+    for (d=0;d<7;d++) {
+        if (weekStrings[d] == currDay)
+            break;
+    }
+    QDate eventDay = QDate::currentDate().addDays((x-MainWindow::leftX)/(MainWindow::gridWidth*2)-d);
+//    QDateTime eventStartTime =
     QLabel* name = new QLabel(this);
     name->setText("事件名称：");
     name->setGeometry(QRect(20,10,60,20));
@@ -38,13 +50,14 @@ void OpenNew::setinit()
     }
     timechoise->button(1)->click();
 
-//单次日期
-    dateEdit->setMinimumDate(QDate::currentDate());
-    dateEdit->setMaximumDate(QDate::currentDate().addDays(365));
-    dateEdit->setDisplayFormat("yyyy.MM.dd");
+    //单次日期
+//    dateEdit->setMinimumDate(QDate::currentDate().addDays(-365));
+//    dateEdit->setMaximumDate(QDate::currentDate().addDays(365));
+    dateEdit->setDate(eventDay);
+    dateEdit->setDisplayFormat("yyyy/MM/dd");
     dateEdit->setGeometry(20,105,150,25);
 
-//重复日期
+    //重复日期
 
     start1->setText("从");
     start1->setGeometry(QRect(20,108,20,20));
@@ -52,7 +65,7 @@ void OpenNew::setinit()
 
     startdate->setMinimumDate(QDate::currentDate());
     startdate->setMaximumDate(QDate::currentDate().addDays(365));
-    startdate->setDisplayFormat("yyyy.MM.dd");
+    startdate->setDisplayFormat("yyyy/MM/dd");
     startdate->setGeometry(40,105,150,25);
     startdate->hide();
 
@@ -62,31 +75,33 @@ void OpenNew::setinit()
 
     enddate->setMinimumDate(QDate::currentDate());
     enddate->setMaximumDate(QDate::currentDate().addDays(365));
-    enddate->setDisplayFormat("yyyy.MM.dd");
+    enddate->setDisplayFormat("yyyy/MM/dd");
     enddate->setGeometry(220,105,150,25);
     enddate->hide();
 
-//时间
+    //时间
     QLabel* start2 = new QLabel(this);
     start2->setText("从");
     start2->setGeometry(QRect(20,143,20,20));
 
-    starttime->setMinimumTime(QTime::currentTime().addSecs(-3600*24));
-    starttime->setMaximumTime(QTime::currentTime().addSecs(3600*24));
-    starttime->setDisplayFormat("HH:mm:ss");
+//    starttime->setMinimumTime(QTime::currentTime().addSecs(-3600*24));
+//    starttime->setMaximumTime(QTime::currentTime().addSecs(3600*24));
+    starttime->setTime(*eventStartTime);
+    starttime->setDisplayFormat("HH:mm");
     starttime->setGeometry(40,140,150,25);
 
     QLabel* end2 = new QLabel(this);
     end2->setText("至");
     end2->setGeometry(QRect(200,143,20,20));
 
-    endtime->setMinimumTime(QTime::currentTime().addSecs(-3600*24));
-    endtime->setMaximumTime(QTime::currentTime().addSecs(3600*24));
-    endtime->setDisplayFormat("HH:mm:ss");
+    endtime->setTime(eventStartTime->addSecs(60*Event::defaultDuration));
+//    endtime->setMinimumTime(QTime::currentTime().addSecs(-3600*24));
+//    endtime->setMaximumTime(QTime::currentTime().addSecs(3600*24));
+    endtime->setDisplayFormat("HH:mm");
     endtime->setGeometry(220,140,150,25);
 
-//week选项
-    QString weekStrings[7] = {"周一", "周二", "周三", "周四", "周五", "周六", "周日"};
+    //week选项
+//    QString weekStrings[7] = {"周一", "周二", "周三", "周四", "周五", "周六", "周日"};
     QButtonGroup *weekdays = new QButtonGroup;
     for(int i=0; i<7; i++)
     {
@@ -103,9 +118,33 @@ void OpenNew::setinit()
 
     QObject::connect(timechoise, SIGNAL(buttonPressed(int)), this, SLOT(TimeChoose(int)));
     QObject::connect(addButton, SIGNAL(clicked(bool)), this, SLOT(send()));
-    QObject::connect(this, SIGNAL(trans(QString, QString, QDateTime, QDateTime, int)), this->parent(), SLOT(addtoEventList(QString, QString, QDateTime, QDateTime, int)));
+    QObject::connect(this, SIGNAL(trans(QString, QString, QDateTime, QDateTime, int)), this->parent(), SLOT(addToEventList(QString, QString, QDateTime, QDateTime, int)));
     QObject::connect(this, SIGNAL(trans(QString, QString, QDateTime, QDateTime, int)), this, SLOT(close()));
 
+    // build a temp event
+    Event *tempEvent = new Event("未命名","",QDateTime(dateEdit->date(), starttime->dateTime().time()),QDateTime(dateEdit->date(), endtime->dateTime().time()),0,this);
+    ((MainWindow*)this->parent())->tempUI = ((MainWindow*)this->parent())->addEventUI(tempEvent);
+}
+
+void OpenNew::send() //myevent: type = 0,   yourevent: type = 1
+{
+    QDateTime start(dateEdit->date(), starttime->dateTime().time());
+    QDateTime end(dateEdit->date(), endtime->dateTime().time());
+    deleteTemp();
+    emit trans(nameinput->text(), placeinput->text(), start, end, 0);
+}
+
+void OpenNew::deleteTemp()
+{
+    if (((MainWindow*)this->parent())->tempUI != NULL) {
+        delete ((MainWindow*)this->parent())->tempUI;
+        ((MainWindow*)this->parent())->tempUI = NULL;
+
+    }
+}
+
+void OpenNew::closeEvent(QCloseEvent *event) {
+    deleteTemp();
 }
 
 void OpenNew::TimeChoose(int id)
