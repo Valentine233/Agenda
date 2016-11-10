@@ -10,9 +10,9 @@ MainWindow::MainWindow(QWidget *parent) :
     QTextStream MyEvent(&MyEventList);
     QTextStream YourEvent(&YourEventList);
     ui->setupUi(this);
+    setWindowStyle();
     setinit();
     setWindowTitle(tr("Agenda"));
-    setWindowStyle();
     offset = 0;
     setTime(offset);
     // trans: an new event is created
@@ -25,8 +25,6 @@ MainWindow::~MainWindow()
 {
     delete ui;
 }
-
-
 
 void MainWindow::setinit()
 {
@@ -75,12 +73,12 @@ void MainWindow::setinit()
     yourlist = new QList<Event*>();
 
     // Read settings
-    qDebug() << "1";
     Event::defaultDuration = 60;
 }
 
 void MainWindow::setWindowStyle() {
-    this->setStyleSheet("MainWindow {background-color:#fff;} QLabel {color:#888;}");
+    this->setStyleSheet("MainWindow {background-color:#fff;}");
+    //this->setStyleSheet("MainWindow {background-color:#fff;} QLabel {color:#888;}");
     this->setFixedSize(rightX+250,bottomY+40);
 
 }
@@ -141,11 +139,34 @@ QLabel* MainWindow::addEventUI(Event *event)
             eventRect->show();
         }
     }
+    //QObject::connect(event,SIGNAL(removeMyUI()),eventRect,SLOT(clear()));
     return eventRect;
+}
+
+void MainWindow::removeEventUI()
+{
+    QString weekStrings[7] = {"周一","周二","周三","周四","周五","周六","周日"};
+    QString weekCurr = curr_time.toString("ddd");
+
+    int i;
+    QList<Event>::Iterator e;
+    for(int k = 0; k < mylist->size(); k++)
+    {
+        for(i=0; i<7; i++)
+        {
+            if(weekCurr == weekStrings[i])
+                break;
+        }
+        if(e->eventStart.date()>=curr_time.addDays(-i).date() && e->eventStart.date()<=curr_time.addDays(6-i).date()) //event is in this week
+        {
+            emit mylist->at(k)->removeMyUI();
+        }
+    }
 }
 
 void MainWindow::setTime(int _offset)
 {
+    //removeEventUI();
     offset = _offset;
     // 是当前时间 + week的偏移量的结果
     curr_time = QDateTime::currentDateTime().addDays(7*offset);
@@ -155,11 +176,9 @@ void MainWindow::setTime(int _offset)
 
     //add EventUI
     int i;
-    //QList<Event> *list = mylist;
     QList<Event>::Iterator e;
     for(int k = 0; k < mylist->size(); k++)
     {
-        qDebug() << "1";
         for(i=0; i<7; i++)
         {
             if(weekCurr == weekStrings[i])
@@ -259,7 +278,6 @@ void MainWindow::turnToEventTime(Event *event)
     int i;
     QString weekStrings[7] = {"周一","周二","周三","周四","周五","周六","周日"};
     QString weekCurr = curr_time.toString("ddd");
-
 
     for(i=0; i<7; i++)
     {

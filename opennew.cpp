@@ -1,12 +1,18 @@
 #include "opennew.h"
 
-//QList<Event>* Event::mylist;
-//QList<Event>* Event::yourlist;
-
+QDateTime MainWindow::curr_time;
+QList<Event*>* MainWindow::mylist;
+QList<Event*>* MainWindow::yourlist;
+QSqlDatabase DB::db;
+QSqlQuery DB::query;
+void AddEvent(QString, QString, QString, QString);
 
 OpenNew::OpenNew(QWidget* parent):QDialog(parent)
 {
     setWindowTitle("New");
+    QDateTime start(QDate(2016,11,11),QTime(11,11,11));
+    QDateTime end(QDate(2016,12,12),QTime(12,12,12));
+    addNewEvent("sleep", "bed", start, end, 0);
 }
 
 void OpenNew::setInit(int x, int y)
@@ -15,14 +21,13 @@ void OpenNew::setInit(int x, int y)
     // y 5 for 15 min, 20 for 1 hour， a grid is 40 - 2 hours
     QTime* eventStartTime = new QTime((y- MainWindow::topY)/(MainWindow::gridHight/2), (y- MainWindow::topY)%(MainWindow::gridHight/2)/((MainWindow::gridHight/4))*30);
     QString weekStrings[7] = {"周一","周二","周三","周四","周五","周六","周日"};
-    QString currDay = QDate::currentDate().toString("ddd");
+    QString currDay = MainWindow::curr_time.toString("ddd");
     int d;
     for (d=0;d<7;d++) {
         if (weekStrings[d] == currDay)
             break;
     }
-    QDate eventDay = QDate::currentDate().addDays((x-MainWindow::leftX)/(MainWindow::gridWidth*2)-d);
-//    QDateTime eventStartTime =
+    QDate eventDay = MainWindow::curr_time.date().addDays((x-MainWindow::leftX)/(MainWindow::gridWidth*2)-d);
     QLabel* name = new QLabel(this);
     name->setText("事件名称：");
     name->setGeometry(QRect(20,10,60,20));
@@ -171,22 +176,24 @@ void OpenNew::TimeChoose(int id)
 
 }
 
-//void OpenNew::addNewEvent(QString name, QString place, QDateTime starttime, QDateTime endtime, int type)
-//{
+void OpenNew::addNewEvent(QString name, QString place, QDateTime starttime, QDateTime endtime, int type)
+{
 
-//    Event *event = new Event(name, place, starttime, endtime, type);
-//    Event::mylist->append(*event);
-//    DB::query.exec("select * from myevent where name = sleep");
-//    if (DB::query.next())
-//    {
-//         qDebug()<< DB::query.value(0).toInt()<<"\n";
-//         qDebug()<< DB::query.value(1).toString()<<"\n";
-//         qDebug()<< DB::query.value(2).toString()<<"\n";
-//         qDebug()<< DB::query.value(3).toDateTime()<<"\n";
-//         qDebug()<< DB::query.value(4).toDateTime()<<"\n";
-//         qDebug()<< DB::query.value(5).toInt()<<"\n";
-//     }
+    Event *event = new Event(name, place, starttime, endtime, type, this);
+    MainWindow::mylist->append(event);
+    DB::db.open();
+    DB::AddEvent(name, place, starttime.toString("yyyy.MM.dd HH:mm:ss"), endtime.toString("yyyy.MM.dd HH:mm:ss"));
+    DB::query.exec("select * from myevent where name = sleep");
+    if (DB::query.next())
+    {
+         qDebug()<< DB::query.value(0).toInt()<<"\n";
+         qDebug()<< DB::query.value(1).toString()<<"\n";
+         qDebug()<< DB::query.value(2).toString()<<"\n";
+         qDebug()<< DB::query.value(3).toDateTime()<<"\n";
+         qDebug()<< DB::query.value(4).toDateTime()<<"\n";
+         qDebug()<< DB::query.value(5).toInt()<<"\n";
+     }
 
-//}
+}
 
 

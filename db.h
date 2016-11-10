@@ -11,9 +11,9 @@ class DB
 {
 public:
     DB();
-    QSqlDatabase db;
-    QSqlQuery query;
-    void AddEvent(QString, QString, QString, QString);
+    static QSqlDatabase db;
+    static QSqlQuery query;
+    static void AddEvent(QString, QString, QString, QString);
 };
 
 #endif // DB_H

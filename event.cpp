@@ -1,5 +1,7 @@
 #include "event.h"
+
 int Event::defaultDuration;
+
 Event::Event(QString name, QString place, QDateTime starttime, QDateTime endtime, int type, QWidget *parent):
     QWidget(parent)
 {
@@ -12,5 +14,3 @@ Event::Event(QString name, QString place, QDateTime starttime, QDateTime endtime
     eventType = type;
     //addtoCalendar(eventName,eventPlace,eventStart,eventEnd,eventType);
 }
-
-

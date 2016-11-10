@@ -1,6 +1,7 @@
 #ifndef OPENNEW_H
 #define OPENNEW_H
 
+#include "mainwindow.h"
 #include "db.h"
 #include "event.h"
 #include <QDialog>
@@ -14,7 +15,6 @@
 #include <QPushButton>
 #include <QCheckBox>
 #include <QList>
-#include <mainwindow.h>
 
 class OpenNew : public QDialog
 {
@@ -29,7 +29,7 @@ signals:
 
 public slots:
     void TimeChoose(int id);
-    //void addNewEvent(QString, QString, QDateTime, QDateTime, int);
+    void addNewEvent(QString, QString, QDateTime, QDateTime, int);
     void send();
     void deleteTemp();
 

@@ -1,6 +1,5 @@
 #include "db.h"
 
-
 DB::DB()
 {
     db = QSqlDatabase::addDatabase("QSQLITE");
@@ -12,12 +11,11 @@ DB::DB()
                "place NVARCHAR(20) NOT NULL,"
                "starttime DATETIME NOT NULL,"
                "endtime DATETIME NOT NULL");
-
 }
 
 void DB::AddEvent(QString name, QString place, QString starttime, QString endtime)
 {
-
+    db.open();
     query.exec(QString("insert into myevent values(nulll,'%1','%2',to_date('%3','yyyy.MM.dd HH:mm:ss'),"
                        "to_date('%4','yyyy.MM.dd HH:mm:ss')").arg(name,place,starttime,endtime));
 

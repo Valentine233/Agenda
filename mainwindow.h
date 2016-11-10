@@ -37,16 +37,17 @@ public:
     ~MainWindow();
     void paintEvent(QPaintEvent *);
     int offset;
-    QDateTime curr_time;
+    static QDateTime curr_time;
     void setTime(int offset);
     void setinit();
     CreateNew *ct = new CreateNew(this);
     void mouseDoubleClickEvent(QMouseEvent *);
     QTextStream MyEvent;
     QTextStream YourEvent;
-    QList<Event*>* mylist;
-    QList<Event*>* yourlist;
+    static QList<Event*>* mylist;
+    static QList<Event*>* yourlist;
     void turnToEventTime(Event *);
+    void removeEventUI();
     QLabel* tempUI = NULL;
     const static int leftX = 50;
     const static int topY = 100;
@@ -54,9 +55,11 @@ public:
     const static int gridWidth = 50;
     const static int rightX = leftX + 14 * gridWidth;
     const static int bottomY = topY + 12 * gridHight;
+
 signals:
     void openNewSignal(QMouseEvent *);
     //void updateEvent(int, int, int, int);
+    void removeUI(Event *event);
 
 public slots:
     //void update(int,int,int,int);

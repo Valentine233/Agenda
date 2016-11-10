@@ -4,7 +4,6 @@
 #include <QString>
 #include <QDateTime>
 #include <QWidget>
-//#include <QGraphicsItem>
 
 class Event : public QWidget
 {
@@ -21,6 +20,10 @@ public:
 
     // in minute
     static int defaultDuration;
+
+signals:
+    void removeMyUI();
+
 };
 
 #endif // EVENT_H
