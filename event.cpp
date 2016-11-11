@@ -13,5 +13,4 @@ Event::Event(QString name, QString place, QDateTime starttime, QDateTime endtime
     //eventEnd = endtime.toString("yyyy.MM.dd HH:mm:ss");
     eventType = type;
     //addtoCalendar(eventName,eventPlace,eventStart,eventEnd,eventType);
-
 }

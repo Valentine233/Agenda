@@ -3,8 +3,6 @@
 QDateTime MainWindow::curr_time;
 QList<Event*>* MainWindow::mylist;
 QList<Event*>* MainWindow::yourlist;
-QSqlDatabase DB::db;
-QSqlQuery DB::query;
 void AddEvent(QString, QString, QString, QString);
 
 OpenNew::OpenNew(QWidget* parent):QDialog(parent)
@@ -123,7 +121,7 @@ void OpenNew::setInit(int x, int y)
 
     QObject::connect(timechoise, SIGNAL(buttonPressed(int)), this, SLOT(TimeChoose(int)));
     QObject::connect(addButton, SIGNAL(clicked(bool)), this, SLOT(send()));
-    QObject::connect(this, SIGNAL(trans(QString, QString, QDateTime, QDateTime, int)), this->parent(), SLOT(addToEventList(QString, QString, QDateTime, QDateTime, int)));
+    QObject::connect(this, SIGNAL(trans(QString, QString, QDateTime, QDateTime, int)), this->parent(), SLOT(createNewEvent(QString, QString, QDateTime, QDateTime, int)));
     QObject::connect(this, SIGNAL(trans(QString, QString, QDateTime, QDateTime, int)), this, SLOT(close()));
 
     // build a temp event

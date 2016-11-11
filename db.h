@@ -6,14 +6,17 @@
 #include <QSqlDatabase>
 #include <QSqlQuery>
 #include <QObject>
-
+#include <QDebug>
+#include <QSqlError>
 class DB
 {
 public:
     DB();
-    static QSqlDatabase db;
-    static QSqlQuery query;
-    static void AddEvent(QString, QString, QString, QString);
+    QSqlDatabase db;
+    QSqlQuery query;
+    void addEvent(QString name, QString place, QDateTime startTime, QDateTime endTime, int type);
+    void dropDB();
+    QSqlQuery readEvent();
 };
 
 #endif // DB_H
