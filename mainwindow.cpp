@@ -119,6 +119,7 @@ void MainWindow::paintEvent(QPaintEvent *)
 
 QLabel* MainWindow::addEventUI(Event *event)
 {
+    qDebug() << "addEventUI\n";
     QString weekStrings[7] = {"周一","周二","周三","周四","周五","周六","周日"};
     QString weekStart = event->eventStart.toString("ddd");
     QLabel *eventRect = new QLabel(this);
@@ -137,19 +138,19 @@ QLabel* MainWindow::addEventUI(Event *event)
             eventRect->setFont(font);
             eventRect->setAlignment(Qt::AlignCenter);
             eventRect->show();
+            event->eventUI = eventRect;
+            qDebug() << "add" << event->eventStart.date() << "\n";
         }
     }
-    //QObject::connect(event,SIGNAL(removeMyUI()),eventRect,SLOT(clear()));
     return eventRect;
 }
 
 void MainWindow::removeEventUI()
 {
+    qDebug() << "removeEventUI\n";
     QString weekStrings[7] = {"周一","周二","周三","周四","周五","周六","周日"};
     QString weekCurr = curr_time.toString("ddd");
-
     int i;
-    QList<Event>::Iterator e;
     for(int k = 0; k < mylist->size(); k++)
     {
         for(i=0; i<7; i++)
@@ -157,16 +158,18 @@ void MainWindow::removeEventUI()
             if(weekCurr == weekStrings[i])
                 break;
         }
-        if(e->eventStart.date()>=curr_time.addDays(-i).date() && e->eventStart.date()<=curr_time.addDays(6-i).date()) //event is in this week
+        if(mylist->at(k)->eventStart.date()>=curr_time.addDays(-i).date() && mylist->at(k)->eventStart.date()<=curr_time.addDays(6-i).date()) //event is in this week
         {
-            emit mylist->at(k)->removeMyUI();
+            qDebug() << "DELETE" << mylist->at(k)->eventStart.date() << "\n";
+            delete mylist->at(k)->eventUI;
         }
     }
 }
 
 void MainWindow::setTime(int _offset)
 {
-    //removeEventUI();
+    qDebug() << "setTime\n";
+    removeEventUI();
     offset = _offset;
     // 是当前时间 + week的偏移量的结果
     curr_time = QDateTime::currentDateTime().addDays(7*offset);
@@ -176,7 +179,6 @@ void MainWindow::setTime(int _offset)
 
     //add EventUI
     int i;
-    QList<Event>::Iterator e;
     for(int k = 0; k < mylist->size(); k++)
     {
         for(i=0; i<7; i++)
@@ -184,7 +186,7 @@ void MainWindow::setTime(int _offset)
             if(weekCurr == weekStrings[i])
                 break;
         }
-        if(e->eventStart.date()>=curr_time.addDays(-i).date() && e->eventStart.date()<=curr_time.addDays(6-i).date()) //event is in this week
+        if(mylist->at(k)->eventStart.date()>=curr_time.addDays(-i).date() && mylist->at(k)->eventStart.date()<=curr_time.addDays(6-i).date()) //event is in this week
         {
             addEventUI(mylist->at(k));
         }

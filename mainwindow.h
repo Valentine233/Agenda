@@ -59,7 +59,7 @@ public:
 signals:
     void openNewSignal(QMouseEvent *);
     //void updateEvent(int, int, int, int);
-    void removeUI(Event *event);
+    //void removeUI(Event *event);
 
 public slots:
     //void update(int,int,int,int);

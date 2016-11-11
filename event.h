@@ -4,6 +4,7 @@
 #include <QString>
 #include <QDateTime>
 #include <QWidget>
+#include <QLabel>
 
 class Event : public QWidget
 {
@@ -17,12 +18,13 @@ public:
     //QString eventStart;
     //QString eventEnd;
     int eventType;
+    QLabel *eventUI;
 
     // in minute
     static int defaultDuration;
 
-signals:
-    void removeMyUI();
+//signals:
+//    void removeMyUI();
 
 };
 
