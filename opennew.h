@@ -21,7 +21,7 @@ class OpenNew : public QDialog
     Q_OBJECT
 
 public:
-    OpenNew(QWidget *parent);
+    OpenNew(QWidget* parent=Q_NULLPTR);
     void setInit(int, int);
 
 signals:

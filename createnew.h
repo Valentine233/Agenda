@@ -14,7 +14,7 @@ class CreateNew : public QDialog
     Q_OBJECT
 
 public:
-    CreateNew(QWidget* parent=nullptr);
+    CreateNew(QWidget* parent=Q_NULLPTR);
     void setinit();
 
 protected slots:

@@ -26,6 +26,7 @@
 #include <QSqlQuery>
 #include <QSqlRecord>
 #include <db.h>
+#include <eventlabel.h>
 namespace Ui {
 class MainWindow;
 }
@@ -37,13 +38,11 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
-    void paintEvent(QPaintEvent *);
     int offset;
     static QDateTime curr_time;
     void refreshAgenda(int offset);
     void setinit();
     CreateNew *ct = new CreateNew(this);
-    void mouseDoubleClickEvent(QMouseEvent *);
     QTextStream MyEvent;
     QTextStream YourEvent;
     static QList<Event*>* mylist;
@@ -58,6 +57,8 @@ public:
     const static int rightX = leftX + 14 * gridWidth;
     const static int bottomY = topY + 12 * gridHight;
     DB* db;
+    void eventsLoseFocus();
+
 
 signals:
     void openNewSignal(QMouseEvent *);
@@ -82,6 +83,10 @@ private:
     QLabel *dayLabels[7];
     QLabel *weekLabels[7];
     void setWindowStyle();
+protected:
+    void mousePressEvent(QMouseEvent *event);
+    void mouseDoubleClickEvent(QMouseEvent *);
+    void paintEvent(QPaintEvent *);
 };
 
 #endif // MAINWINDOW_H

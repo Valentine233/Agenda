@@ -107,7 +107,6 @@ void MainWindow::paintEvent(QPaintEvent *)
         divide[i] = QLine(leftX+gridWidth*(2*i+1),topY,leftX+gridWidth*(2*i+1),bottomY);
     }
 
-
     painter->setPen(Qt::gray);
     painter->drawLines(hlines, 13);
     painter->drawLines(vlines, 8);
@@ -125,7 +124,7 @@ QLabel* MainWindow::addEventUI(Event *event)
 //    qDebug() << "addEventUI\n";
     QString weekStrings[7] = {"周一","周二","周三","周四","周五","周六","周日"};
     QString weekStart = event->eventStart.toString("ddd");
-    QLabel *eventRect = new QLabel(this);
+    EventLabel* eventRect = new EventLabel(this);
     int startminute = 60*event->eventStart.toString("HH").toInt() + event->eventStart.toString("mm").toInt();
     int endminute = 60*event->eventEnd.toString("HH").toInt() + event->eventEnd.toString("mm").toInt();
 
@@ -297,4 +296,17 @@ void MainWindow::loadFromDB() {
        Event *event = new Event(name,place,starttime,endtime,type,this);
        mylist->append(event);
     }
+}
+
+void MainWindow::eventsLoseFocus() {
+    for(int k = 0; k < mylist->size(); k++)
+    {
+        if (mylist->at(k)->eventUI != NULL) {
+            mylist->at(k)->eventUI->setStyleSheet("background-color: rgba(34, 24, 245, 50);text-align: center; ");
+        }
+    }
+}
+void MainWindow::mousePressEvent(QMouseEvent *event) {
+    eventsLoseFocus();
+    event->accept();
 }
