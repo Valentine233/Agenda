@@ -7,12 +7,15 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
-    QTextStream MyEvent(&MyEventList);
-    QTextStream YourEvent(&YourEventList);
+//    db->dropDB();
+//    QTextStream MyEvent(&MyEventList);
+//    QTextStream YourEvent(&YourEventList);
     ui->setupUi(this);
-    setWindowStyle();
     setinit();
+    setWindowStyle();
     setWindowTitle(tr("Agenda"));
+    db = new DB();
+    loadFromDB();
     offset = 0;
     refreshAgenda(offset);
     // trans: an new event is created
@@ -119,7 +122,7 @@ void MainWindow::paintEvent(QPaintEvent *)
 
 QLabel* MainWindow::addEventUI(Event *event)
 {
-    qDebug() << "addEventUI\n";
+//    qDebug() << "addEventUI\n";
     QString weekStrings[7] = {"周一","周二","周三","周四","周五","周六","周日"};
     QString weekStart = event->eventStart.toString("ddd");
     QLabel *eventRect = new QLabel(this);
@@ -139,7 +142,7 @@ QLabel* MainWindow::addEventUI(Event *event)
             eventRect->setAlignment(Qt::AlignCenter);
             eventRect->show();
             event->eventUI = eventRect;
-            qDebug() << "add" << event->eventStart.date() << "\n";
+//            qDebug() << "add" << event->eventStart.date() << "\n";
         }
     }
     return eventRect;
@@ -154,12 +157,12 @@ void MainWindow::removeEventUI()
             mylist->at(k)->eventUI = NULL;
         }
     }
-    qDebug() << "removeEventUI END\n";
+//    qDebug() << "removeEventUI END\n";
 }
 
 void MainWindow::refreshAgenda(int _offset)
 {
-    qDebug() << "refreshAgenda\n";
+//    qDebug() << "refreshAgenda\n";
     removeEventUI();
     offset = _offset;
     // 是当前时间 + week的偏移量的结果
@@ -240,7 +243,7 @@ void MainWindow::add(QString day, QString time1, QString time2)
     QLabel *time_c = new QLabel(this);
     time_c->setGeometry(QRect(20,250,100,30));
     time_c->setText(day+time1+time2);
-    qDebug() << "ADDED";
+//    qDebug() << "ADDED";
 }
 
 void MainWindow::mouseDoubleClickEvent(QMouseEvent *event)
@@ -267,9 +270,31 @@ void MainWindow::turnToEventTime(Event *event)
     refreshAgenda(offset);
 }
 
-void MainWindow::addToEventList(QString name, QString place, QDateTime starttime, QDateTime endtime, int type)
+void MainWindow::createNewEvent(QString name, QString place, QDateTime starttime, QDateTime endtime, int type)
 {
     Event *event = new Event(name,place,starttime,endtime,type,this);
     mylist->append(event);
+    db->addEvent(name,place,starttime,endtime,type);
     turnToEventTime(event);
+}
+
+void MainWindow::loadFromDB() {
+
+    QSqlQuery query = db->readEvent();
+    QSqlRecord record = query.record();
+    int idName = record.indexOf("name");
+    int idPlace = record.indexOf("place");
+    int idStart = record.indexOf("starttime");
+    int idEnd = record.indexOf("endtime");
+    int idType = record.indexOf("type");
+    while (query.next())
+    {
+       QString name = query.value(idName).toString();
+       QString place = query.value(idPlace).toString();
+       QDateTime starttime = QDateTime::fromString(query.value(idStart).toString());
+       QDateTime endtime = QDateTime::fromString(query.value(idEnd).toString());
+       int type = query.value(idType).toString().toInt();
+       Event *event = new Event(name,place,starttime,endtime,type,this);
+       mylist->append(event);
+    }
 }

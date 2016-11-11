@@ -23,7 +23,9 @@
 #include <QGraphicsScene>
 #include <QGraphicsView>
 #include <QList>
-
+#include <QSqlQuery>
+#include <QSqlRecord>
+#include <db.h>
 namespace Ui {
 class MainWindow;
 }
@@ -55,6 +57,7 @@ public:
     const static int gridWidth = 50;
     const static int rightX = leftX + 14 * gridWidth;
     const static int bottomY = topY + 12 * gridHight;
+    DB* db;
 
 signals:
     void openNewSignal(QMouseEvent *);
@@ -69,8 +72,9 @@ public slots:
     void backwards();
     void currentTime();
     void openNew(QMouseEvent *);
-    void addToEventList(QString, QString, QDateTime, QDateTime, int);
+    void createNewEvent(QString, QString, QDateTime, QDateTime, int);
     QLabel* addEventUI(Event *);
+    void loadFromDB();
 
 private:
     Ui::MainWindow *ui;
