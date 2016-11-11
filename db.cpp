@@ -16,7 +16,7 @@ DB::DB()
 void DB::AddEvent(QString name, QString place, QString starttime, QString endtime)
 {
     db.open();
-    query.exec(QString("insert into myevent values(nulll,'%1','%2',to_date('%3','yyyy.MM.dd HH:mm:ss'),"
+    query.exec(QString("insert into myevent values(null,'%1','%2',to_date('%3','yyyy.MM.dd HH:mm:ss'),"
                        "to_date('%4','yyyy.MM.dd HH:mm:ss')").arg(name,place,starttime,endtime));
 
 }
