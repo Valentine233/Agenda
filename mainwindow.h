@@ -38,7 +38,7 @@ public:
     void paintEvent(QPaintEvent *);
     int offset;
     static QDateTime curr_time;
-    void setTime(int offset);
+    void refreshAgenda(int offset);
     void setinit();
     CreateNew *ct = new CreateNew(this);
     void mouseDoubleClickEvent(QMouseEvent *);

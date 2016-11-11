@@ -12,7 +12,7 @@ OpenNew::OpenNew(QWidget* parent):QDialog(parent)
     setWindowTitle("New");
     QDateTime start(QDate(2016,11,11),QTime(11,11,11));
     QDateTime end(QDate(2016,12,12),QTime(12,12,12));
-    addNewEvent("sleep", "bed", start, end, 0);
+//    addNewEvent("sleep", "bed", start, end, 0);
 }
 
 void OpenNew::setInit(int x, int y)
@@ -181,18 +181,18 @@ void OpenNew::addNewEvent(QString name, QString place, QDateTime starttime, QDat
 
     Event *event = new Event(name, place, starttime, endtime, type, this);
     MainWindow::mylist->append(event);
-    DB::db.open();
-    DB::AddEvent(name, place, starttime.toString("yyyy.MM.dd HH:mm:ss"), endtime.toString("yyyy.MM.dd HH:mm:ss"));
-    DB::query.exec("select * from myevent where name = sleep");
-    if (DB::query.next())
-    {
-         qDebug()<< DB::query.value(0).toInt()<<"\n";
-         qDebug()<< DB::query.value(1).toString()<<"\n";
-         qDebug()<< DB::query.value(2).toString()<<"\n";
-         qDebug()<< DB::query.value(3).toDateTime()<<"\n";
-         qDebug()<< DB::query.value(4).toDateTime()<<"\n";
-         qDebug()<< DB::query.value(5).toInt()<<"\n";
-     }
+//    DB::db.open();
+//    DB::AddEvent(name, place, starttime.toString("yyyy.MM.dd HH:mm:ss"), endtime.toString("yyyy.MM.dd HH:mm:ss"));
+//    DB::query.exec("select * from myevent where name = sleep");
+//    if (DB::query.next())
+//    {
+//         qDebug()<< DB::query.value(0).toInt()<<"\n";
+//         qDebug()<< DB::query.value(1).toString()<<"\n";
+//         qDebug()<< DB::query.value(2).toString()<<"\n";
+//         qDebug()<< DB::query.value(3).toDateTime()<<"\n";
+//         qDebug()<< DB::query.value(4).toDateTime()<<"\n";
+//         qDebug()<< DB::query.value(5).toInt()<<"\n";
+//     }
 
 }
 

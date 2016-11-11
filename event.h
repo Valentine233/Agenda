@@ -18,7 +18,7 @@ public:
     //QString eventStart;
     //QString eventEnd;
     int eventType;
-    QLabel *eventUI;
+    QLabel *eventUI = NULL;
 
     // in minute
     static int defaultDuration;
