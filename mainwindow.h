@@ -3,7 +3,6 @@
 
 #include "event.h"
 #include "opennew.h"
-#include "createnew.h"
 #include "ui_mainwindow.h"
 #include <QMainWindow>
 #include <QWidget>
@@ -42,7 +41,6 @@ public:
     static QDateTime curr_time;
     void refreshAgenda(int offset);
     void setinit();
-    CreateNew *ct = new CreateNew(this);
     QTextStream MyEvent;
     QTextStream YourEvent;
     static QList<Event*>* mylist;
@@ -62,19 +60,14 @@ public:
 
 signals:
     void openNewSignal(QMouseEvent *);
-    //void updateEvent(int, int, int, int);
-    //void removeUI(Event *event);
 
 public slots:
-    //void update(int,int,int,int);
-    void open();
-    void add(QString, QString, QString);
     void forward();
     void backwards();
     void currentTime();
-    void openNew(QMouseEvent *);
+    void openSpecialNew(QMouseEvent *);
+    void openGeneralNew();
     void createNewEvent(QString, QString, QDateTime, QDateTime, int);
-    Event* findEvent(int x, int y);
     void editEvent(QString, QString, QDateTime, QDateTime, int, QString, QString, QDateTime, QDateTime);
     void deleteEvent(QString, QString, QDateTime, QDateTime, int);
     QLabel* addEventUI(Event *);

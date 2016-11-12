@@ -1,13 +1,17 @@
 #ifndef EVENTLABEL_H
 #define EVENTLABEL_H
 
+#include "mainwindow.h"
 #include "opennew.h"
 #include <QObject>
 #include <QWidget>
 #include <QLabel>
 #include <QMouseEvent>
 #include <QFocusEvent>
-#include <mainwindow.h>
+#include <QMenu>
+#include <QAction>
+#include <QPoint>
+
 class EventLabel : public QLabel
 {
     Q_OBJECT
@@ -21,6 +25,7 @@ public slots:
 
 signals:
     void modifySignal(QMouseEvent *event);
+    void deleteConfirmSign(QString name, QString place, QDateTime startTime, QDateTime endTime, int type);
 
 protected:
     void mousePressEvent(QMouseEvent *event);

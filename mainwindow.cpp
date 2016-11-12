@@ -18,9 +18,8 @@ MainWindow::MainWindow(QWidget *parent) :
 //    db->dropDB();
     offset = 0;
     refreshAgenda(offset);
-    // trans: an new event is created
-    QObject::connect(ct, SIGNAL(trans(QString,QString,QString)), this, SLOT(add(QString,QString,QString)));
-    QObject::connect(this, SIGNAL(openNewSignal(QMouseEvent*)), this, SLOT(openNew(QMouseEvent*)));
+    // trans: an new special event is created
+    QObject::connect(this, SIGNAL(openNewSignal(QMouseEvent*)), this, SLOT(openSpecialNew(QMouseEvent*)));
 
 }
 
@@ -31,9 +30,10 @@ MainWindow::~MainWindow()
 
 void MainWindow::setinit()
 {
+    // create a new general event
     QPushButton *create = new QPushButton ( "&Create", this);
     create->setGeometry(800,100,100,40);
-    connect(create, SIGNAL(clicked(bool)), this, SLOT(open()));
+    connect(create, SIGNAL(clicked(bool)), this, SLOT(openGeneralNew()));
 
     // to next week
     QPushButton *forward_button = new QPushButton ( ">", this);
@@ -121,7 +121,6 @@ void MainWindow::paintEvent(QPaintEvent *)
 
 QLabel* MainWindow::addEventUI(Event *event)
 {
-//    qDebug() << "addEventUI\n";
     QString weekStrings[7] = {"周一","周二","周三","周四","周五","周六","周日"};
     QString weekStart = event->eventStart.toString("ddd");
     EventLabel* eventRect = new EventLabel(this, event);
@@ -141,7 +140,6 @@ QLabel* MainWindow::addEventUI(Event *event)
             eventRect->setAlignment(Qt::AlignCenter);
             eventRect->show();
             event->eventUI = eventRect;
-//            qDebug() << "add" << event->eventStart.date() << "\n";
         }
     }
     return eventRect;
@@ -156,12 +154,10 @@ void MainWindow::removeEventUI()
             mylist->at(k)->eventUI = NULL;
         }
     }
-//    qDebug() << "removeEventUI END\n";
 }
 
 void MainWindow::refreshAgenda(int _offset)
 {
-//    qDebug() << "refreshAgenda\n";
     removeEventUI();
     offset = _offset;
     // 是当前时间 + week的偏移量的结果
@@ -230,21 +226,6 @@ void MainWindow::currentTime()
     refreshAgenda(0);
 }
 
-void MainWindow::open()
-{
-    ct->setinit();
-    ct->setModal(true);
-    ct->show();
-}
-
-void MainWindow::add(QString day, QString time1, QString time2)
-{
-    QLabel *time_c = new QLabel(this);
-    time_c->setGeometry(QRect(20,250,100,30));
-    time_c->setText(day+time1+time2);
-//    qDebug() << "ADDED";
-}
-
 void MainWindow::mouseDoubleClickEvent(QMouseEvent *event)
 {
 
@@ -254,11 +235,19 @@ void MainWindow::mouseDoubleClickEvent(QMouseEvent *event)
     }
 }
 
-void MainWindow::openNew(QMouseEvent *event)
+void MainWindow::openSpecialNew(QMouseEvent *event)
 {
     OpenNew opennew(this);
     opennew.setGeometry(event->globalX()+50,event->globalY()-30,400,240);
     opennew.setInit(event->x(), event->y());
+    opennew.exec();
+}
+
+void MainWindow::openGeneralNew()
+{
+    OpenNew opennew(this);
+    opennew.setGeometry(leftX+380,topY+160,400,240);
+    opennew.setInit(-1,-1);
     opennew.exec();
 }
 
@@ -274,29 +263,8 @@ void MainWindow::createNewEvent(QString name, QString place, QDateTime starttime
     Event *event = new Event(name,place,starttime,endtime,type,this);
     mylist->append(event);
     db->addEvent(name,place,starttime,endtime,type);
+    //writeToFile(MyEventList);
     turnToEventTime(event);
-}
-
-Event* MainWindow::findEvent(int x, int y)
-{
-    QTime eventTime((y- topY)/(gridHight/2), (y- topY)%(gridHight/2)/((gridHight/4))*30);
-    QString weekStrings[7] = {"周一","周二","周三","周四","周五","周六","周日"};
-    QString currDay = curr_time.toString("ddd");
-    int d;
-    for (d=0;d<7;d++) {
-        if (weekStrings[d] == currDay)
-            break;
-    }
-    QDate eventDay = curr_time.date().addDays((x-leftX)/(gridWidth*2)-d);
-    for(int k = 0; k < mylist->size(); k++)
-    {
-        if (mylist->at(k)->eventStart.date() ==  eventDay && mylist->at(k)->eventStart.time()<=eventTime
-                && mylist->at(k)->eventEnd.time()>=eventTime && mylist->at(k)->eventType == 0)
-        {
-            return mylist->at(k);
-        }
-        qDebug() << "can not find event\n";
-    }
 }
 
 void MainWindow::editEvent(QString name, QString place, QDateTime starttime, QDateTime endtime, int type, QString nameOld, QString placeOld, QDateTime startOld, QDateTime endOld)
@@ -371,3 +339,24 @@ void MainWindow::mousePressEvent(QMouseEvent *event) {
     eventsLoseFocus();
     event->accept();
 }
+
+//void writeToFile(QFile MyEventList)
+//{
+//    if (!MyEventList.open(QIODevice::WriteOnly | QIODevice::Text))
+//       return;
+//    QTextStream out(&MyEventList);
+//    out << "The magic number is: " << 49 << "\n";
+//}
+
+//void readFromFile(QFile YourEventList)
+//{
+//    if(!YourEventList.open(QIODevice::ReadOnly | QIODevice::Text))
+//    {
+//         qDebug()<<"Can't open the file!\n";
+//    }
+//    while(!YourEventList.atEnd()) {
+//        QByteArray line = file.readLine();
+//        QString str(line);
+//        qDebug()<< str;
+//    }
+//}

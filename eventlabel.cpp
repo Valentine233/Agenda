@@ -7,21 +7,42 @@ EventLabel::EventLabel(QWidget* parent, Event* _event) : QLabel(parent)
 
 }
 
-//点击一次，显示高亮
+//点击一次
 void EventLabel::mousePressEvent(QMouseEvent *event) {
-    ((MainWindow*)parent())->eventsLoseFocus();
-    this->setStyleSheet("EventLabel {background-color: rgba(34, 24, 245, 90); text-align: center; }");
-    event->accept();  //what to do with accept?
+    //左键，显示高亮
+    if(event->button() == Qt::LeftButton)
+    {
+        ((MainWindow*)parent())->eventsLoseFocus();
+        this->setStyleSheet("EventLabel {background-color: rgba(34, 24, 245, 90); text-align: center; }");
+        event->accept();
+    }
+    //右键，编辑或删除
+    else if(event->button() == Qt::RightButton)
+    {
+//        ((MainWindow*)parent())->eventsLoseFocus();
+//        this->setStyleSheet("EventLabel {background-color: rgba(34, 24, 245, 90); text-align: center; }");
+
+//        QMenu *menu = new QMenu(this);
+//        QAction *editAction = new QAction("编辑", this);
+//        menu->addAction(editAction);
+//        connect(editAction, SIGNAL(triggered()), this, SLOT(menuModify()));
+//        QAction *deleteAction = new QAction("删除", this);
+//        OpenNew editWindow((MainWindow*)parent());
+//        connect(deleteAction, SIGNAL(deleteConfirmSign(QString, QString, QDateTime, QDateTime, int)), editWindow, SLOT(deleteEventConfirm(QString, QString, QDateTime, QDateTime, int)));
+//        menu->addAction(deleteAction);
+//        menu->show();
+//        event->accept();
+    }
+
 }
 
 //点击两次，修改或删除事件
 void EventLabel::mouseDoubleClickEvent(QMouseEvent *event)
 {
-    if( event->buttons() == Qt::LeftButton)
+    if(event->buttons() == Qt::LeftButton)
     {
         event->accept();
         emit modifySignal(event);
-
     }
 }
 

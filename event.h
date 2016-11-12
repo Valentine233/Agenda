@@ -15,16 +15,11 @@ public:
     QString eventPlace;
     QDateTime eventStart;
     QDateTime eventEnd;
-    //QString eventStart;
-    //QString eventEnd;
     int eventType;
     QLabel *eventUI = NULL;
 
     // in minute
     static int defaultDuration;
-
-//signals:
-//    void removeMyUI();
 
 };
 

@@ -15,14 +15,12 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    createnew.cpp \
     opennew.cpp \
     event.cpp \
     db.cpp \
     eventlabel.cpp
 
 HEADERS  += mainwindow.h \
-    createnew.h \
     opennew.h \
     event.h \
     db.h \

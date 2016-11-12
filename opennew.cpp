@@ -12,16 +12,30 @@ OpenNew::OpenNew(QWidget* parent):QDialog(parent)
 
 void OpenNew::setInit(int x, int y)
 {
-    // y 5 for 15 min, 20 for 1 hour， a grid is 40 - 2 hours
-    QTime* eventStartTime = new QTime((y- MainWindow::topY)/(MainWindow::gridHight/2), (y- MainWindow::topY)%(MainWindow::gridHight/2)/((MainWindow::gridHight/4))*30);
+    QTime* eventStartTime;
+    QDate eventDay;
     QString weekStrings[7] = {"周一","周二","周三","周四","周五","周六","周日"};
-    QString currDay = MainWindow::curr_time.toString("ddd");
-    int d;
-    for (d=0;d<7;d++) {
-        if (weekStrings[d] == currDay)
-            break;
+
+    if(x==-1 && y==-1)    //generalEvent
+    {
+        QTime* time = new QTime(MainWindow::curr_time.time());
+        eventStartTime = time;
+        eventDay = MainWindow::curr_time.date();
     }
-    QDate eventDay = MainWindow::curr_time.date().addDays((x-MainWindow::leftX)/(MainWindow::gridWidth*2)-d);
+    else    //specialEvent
+    {
+        // y 5 for 15 min, 20 for 1 hour， a grid is 40 - 2 hours
+        QTime* time = new QTime((y- MainWindow::topY)/(MainWindow::gridHight/2), (y- MainWindow::topY)%(MainWindow::gridHight/2)/((MainWindow::gridHight/4))*30);
+        eventStartTime = time;
+        QString currDay = MainWindow::curr_time.toString("ddd");
+        int d;
+        for (d=0;d<7;d++) {
+            if (weekStrings[d] == currDay)
+                break;
+        }
+        eventDay = MainWindow::curr_time.date().addDays((x-MainWindow::leftX)/(MainWindow::gridWidth*2)-d);
+    }
+
     QLabel* name = new QLabel(this);
     name->setText("事件名称：");
     name->setGeometry(QRect(20,10,60,20));
@@ -145,10 +159,18 @@ void OpenNew::setInit(int x, int y)
 
 void OpenNew::sendAdd() //myevent: type = 0,   yourevent: type = 1
 {
+    connect(this, SIGNAL(diffDaysSignal()), this, SLOT(diffDaysWarning()));
     QDateTime start(dateEdit->date(), starttime->dateTime().time());
     QDateTime end(dateEdit->date(), endtime->dateTime().time());
     deleteTemp();
-    emit transAdd(nameinput->text(), placeinput->text(), start, end, 0);
+    if(start.time() > end.time())
+    {
+        emit diffDaysSignal();
+    }
+    else
+    {
+        emit transAdd(nameinput->text(), placeinput->text(), start, end, 0);
+    }
 }
 
 void OpenNew::sendEdit()
@@ -228,11 +250,20 @@ void OpenNew::deleteEventConfirm(QString name, QString place, QDateTime startTim
 {
     QMessageBox messageBox(this);
     messageBox.setText("确定删除事件么？");
-    QAbstractButton *deleteBt = messageBox.addButton(QMessageBox::Yes);
     QAbstractButton *notDeleteBt = messageBox.addButton(QMessageBox::No);
+    QAbstractButton *deleteBt = messageBox.addButton(QMessageBox::Yes);
     messageBox.exec();
     if (messageBox.clickedButton() == deleteBt) {
         emit deleteConfirm(name, place, startTime, endTime, type);
     }
+}
+
+void OpenNew::diffDaysWarning()
+{
+    QMessageBox messageBox(this);
+    messageBox.setText("不能添加跨天事件！");
+    QAbstractButton *confirmBt = messageBox.addButton(QMessageBox::Ok);
+    messageBox.exec();
+    connect(confirmBt, SIGNAL(clicked(bool)), this, SLOT(close()));
 }
 
