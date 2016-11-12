@@ -54,6 +54,7 @@ void DB::deleteEvent(QString name, QString place, QDateTime startTime, QDateTime
     query.bindValue(":type", type);
     if(!query.exec())
     {
+        qDebug() << "deleteError\n";
         qDebug()<<query.lastError();
     }
 }

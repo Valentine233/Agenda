@@ -74,7 +74,7 @@ public slots:
     void currentTime();
     void openNew(QMouseEvent *);
     void createNewEvent(QString, QString, QDateTime, QDateTime, int);
-    Event* findEvent(QMouseEvent *event);
+    Event* findEvent(int x, int y);
     void editEvent(QString, QString, QDateTime, QDateTime, int, QString, QString, QDateTime, QDateTime);
     void deleteEvent(QString, QString, QDateTime, QDateTime, int);
     QLabel* addEventUI(Event *);

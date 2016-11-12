@@ -277,10 +277,8 @@ void MainWindow::createNewEvent(QString name, QString place, QDateTime starttime
     turnToEventTime(event);
 }
 
-Event* MainWindow::findEvent(QMouseEvent *event)
+Event* MainWindow::findEvent(int x, int y)
 {
-    int x = event->x();
-    int y = event->y();
     QTime eventTime((y- topY)/(gridHight/2), (y- topY)%(gridHight/2)/((gridHight/4))*30);
     QString weekStrings[7] = {"周一","周二","周三","周四","周五","周六","周日"};
     QString currDay = curr_time.toString("ddd");
@@ -297,6 +295,7 @@ Event* MainWindow::findEvent(QMouseEvent *event)
         {
             return mylist->at(k);
         }
+        qDebug() << "can not find event\n";
     }
 }
 

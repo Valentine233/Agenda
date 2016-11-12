@@ -129,6 +129,8 @@ void OpenNew::setInit(int x, int y)
     QObject::connect(confirmButton, SIGNAL(clicked(bool)), this, SLOT(sendEdit()));
     QObject::connect(this, SIGNAL(transEdit(QString, QString, QDateTime, QDateTime, int, QString, QString, QDateTime, QDateTime)),
                      this->parent(), SLOT(editEvent(QString, QString, QDateTime, QDateTime, int, QString, QString, QDateTime, QDateTime)));
+//    QObject::connect(this, SIGNAL(transEdit(QString, QString, QDateTime, QDateTime, int, QString, QString, QDateTime, QDateTime)),
+//                     eventLabel, SLOT(cancelHighlight()));
     QObject::connect(this, SIGNAL(transEdit(QString, QString, QDateTime, QDateTime, int, QString, QString, QDateTime, QDateTime)),
                      this, SLOT(close()));
 
@@ -142,6 +144,8 @@ void OpenNew::setInit(int x, int y)
                      this, SLOT(deleteEventConfirm(QString, QString, QDateTime, QDateTime, int)));
     QObject::connect(this, SIGNAL(deleteConfirm(QString,QString,QDateTime,QDateTime,int)),
                      this->parent(), SLOT(deleteEvent(QString, QString, QDateTime, QDateTime, int)));
+//    QObject::connect(this, SIGNAL(deleteConfirm(QString, QString, QDateTime, QDateTime, int, QString, QString, QDateTime, QDateTime)),
+//                     eventLabel, SLOT(cancelHighlight()));
     QObject::connect(this, SIGNAL(deleteConfirm(QString,QString,QDateTime,QDateTime,int)),
                      this, SLOT(close()));
 
@@ -215,7 +219,6 @@ void OpenNew::showCurr(Event *event)
 {
     qDebug() << event->eventName << event->eventPlace  << event->eventStart.date() << event->eventStart.time()<<"\n";
     setWindowTitle("Edit");
-    qDebug() << "1" << "\n";
     nameinput->setText(event->eventName);
     nameOld = event->eventName;
     placeinput->setText(event->eventPlace);
@@ -226,12 +229,11 @@ void OpenNew::showCurr(Event *event)
     starttimeOld = event->eventStart.time();
     endtime->setTime(event->eventEnd.time());
     endtimeOld = event->eventEnd.time();
-    qDebug() << "2" << "\n";
     addButton->hide();
     confirmButton->show();
     deleteButton->show();
+    ((MainWindow*)this->parent())->tempUI->hide();
     this->exec();
-
 }
 
 void deleteEventConfirm(QString, QString, QDateTime, QDateTime, int)

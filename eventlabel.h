@@ -17,6 +17,7 @@ public:
 
 public slots:
     void modify(QMouseEvent *event);
+    void cancelHighlight();
 
 signals:
     void modifySignal(QMouseEvent *event);
