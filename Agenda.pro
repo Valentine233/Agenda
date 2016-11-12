@@ -18,13 +18,15 @@ SOURCES += main.cpp\
     createnew.cpp \
     opennew.cpp \
     event.cpp \
-    db.cpp
+    db.cpp \
+    eventlabel.cpp
 
 HEADERS  += mainwindow.h \
     createnew.h \
     opennew.h \
     event.h \
-    db.h
+    db.h \
+    eventlabel.h
 
 FORMS    += mainwindow.ui
 
