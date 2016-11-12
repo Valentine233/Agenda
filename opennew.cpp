@@ -12,7 +12,6 @@ OpenNew::OpenNew(QWidget* parent):QDialog(parent)
 
 void OpenNew::setInit(int x, int y)
 {
-    //qDebug() << x << y;
     // y 5 for 15 min, 20 for 1 hour， a grid is 40 - 2 hours
     QTime* eventStartTime = new QTime((y- MainWindow::topY)/(MainWindow::gridHight/2), (y- MainWindow::topY)%(MainWindow::gridHight/2)/((MainWindow::gridHight/4))*30);
     QString weekStrings[7] = {"周一","周二","周三","周四","周五","周六","周日"};
@@ -83,9 +82,6 @@ void OpenNew::setInit(int x, int y)
     QLabel* start2 = new QLabel(this);
     start2->setText("从");
     start2->setGeometry(QRect(20,143,20,20));
-
-//    starttime->setMinimumTime(QTime::currentTime().addSecs(-3600*24));
-//    starttime->setMaximumTime(QTime::currentTime().addSecs(3600*24));
     starttime->setTime(*eventStartTime);
     starttime->setDisplayFormat("HH:mm");
     starttime->setGeometry(40,140,150,25);
@@ -95,13 +91,10 @@ void OpenNew::setInit(int x, int y)
     end2->setGeometry(QRect(200,143,20,20));
 
     endtime->setTime(eventStartTime->addSecs(60*Event::defaultDuration));
-//    endtime->setMinimumTime(QTime::currentTime().addSecs(-3600*24));
-//    endtime->setMaximumTime(QTime::currentTime().addSecs(3600*24));
     endtime->setDisplayFormat("HH:mm");
     endtime->setGeometry(220,140,150,25);
 
     //week选项
-//    QString weekStrings[7] = {"周一", "周二", "周三", "周四", "周五", "周六", "周日"};
     QButtonGroup *weekdays = new QButtonGroup;
     for(int i=0; i<7; i++)
     {
@@ -129,8 +122,6 @@ void OpenNew::setInit(int x, int y)
     QObject::connect(confirmButton, SIGNAL(clicked(bool)), this, SLOT(sendEdit()));
     QObject::connect(this, SIGNAL(transEdit(QString, QString, QDateTime, QDateTime, int, QString, QString, QDateTime, QDateTime)),
                      this->parent(), SLOT(editEvent(QString, QString, QDateTime, QDateTime, int, QString, QString, QDateTime, QDateTime)));
-//    QObject::connect(this, SIGNAL(transEdit(QString, QString, QDateTime, QDateTime, int, QString, QString, QDateTime, QDateTime)),
-//                     eventLabel, SLOT(cancelHighlight()));
     QObject::connect(this, SIGNAL(transEdit(QString, QString, QDateTime, QDateTime, int, QString, QString, QDateTime, QDateTime)),
                      this, SLOT(close()));
 
@@ -144,8 +135,6 @@ void OpenNew::setInit(int x, int y)
                      this, SLOT(deleteEventConfirm(QString, QString, QDateTime, QDateTime, int)));
     QObject::connect(this, SIGNAL(deleteConfirm(QString,QString,QDateTime,QDateTime,int)),
                      this->parent(), SLOT(deleteEvent(QString, QString, QDateTime, QDateTime, int)));
-//    QObject::connect(this, SIGNAL(deleteConfirm(QString, QString, QDateTime, QDateTime, int, QString, QString, QDateTime, QDateTime)),
-//                     eventLabel, SLOT(cancelHighlight()));
     QObject::connect(this, SIGNAL(deleteConfirm(QString,QString,QDateTime,QDateTime,int)),
                      this, SLOT(close()));
 
@@ -217,7 +206,6 @@ void OpenNew::TimeChoose(int id)
 
 void OpenNew::showCurr(Event *event)
 {
-    qDebug() << event->eventName << event->eventPlace  << event->eventStart.date() << event->eventStart.time()<<"\n";
     setWindowTitle("Edit");
     nameinput->setText(event->eventName);
     nameOld = event->eventName;
@@ -236,8 +224,15 @@ void OpenNew::showCurr(Event *event)
     this->exec();
 }
 
-void deleteEventConfirm(QString, QString, QDateTime, QDateTime, int)
+void OpenNew::deleteEventConfirm(QString name, QString place, QDateTime startTime, QDateTime endTime, int type)
 {
-    QMessageBox::information(NULL, "Delete", "Are you sure to delete the event?", QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+    QMessageBox messageBox(this);
+    messageBox.setText("确定删除事件么？");
+    QAbstractButton *deleteBt = messageBox.addButton(QMessageBox::Yes);
+    QAbstractButton *notDeleteBt = messageBox.addButton(QMessageBox::No);
+    messageBox.exec();
+    if (messageBox.clickedButton() == deleteBt) {
+        emit deleteConfirm(name, place, startTime, endTime, type);
+    }
 }
 

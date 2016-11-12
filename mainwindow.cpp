@@ -124,7 +124,7 @@ QLabel* MainWindow::addEventUI(Event *event)
 //    qDebug() << "addEventUI\n";
     QString weekStrings[7] = {"周一","周二","周三","周四","周五","周六","周日"};
     QString weekStart = event->eventStart.toString("ddd");
-    EventLabel* eventRect = new EventLabel(this);
+    EventLabel* eventRect = new EventLabel(this, event);
     int startminute = 60*event->eventStart.toString("HH").toInt() + event->eventStart.toString("mm").toInt();
     int endminute = 60*event->eventEnd.toString("HH").toInt() + event->eventEnd.toString("mm").toInt();
 
@@ -325,7 +325,10 @@ void MainWindow::deleteEvent(QString name, QString place, QDateTime starttime, Q
         if (mylist->at(k)->eventName == name && mylist->at(k)->eventPlace == place && mylist->at(k)->eventStart == starttime
                 && mylist->at(k)->eventEnd == endtime && mylist->at(k)->eventType == type)
         {
+            Event* _event = mylist->at(k);
             mylist->removeAt(k);
+            delete _event->eventUI;
+            delete _event;
             refreshAgenda(offset);
 
             //从数据库删除

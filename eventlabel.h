@@ -13,18 +13,17 @@ class EventLabel : public QLabel
     Q_OBJECT
 
 public:
-    EventLabel(QWidget* parent=Q_NULLPTR);
+    EventLabel(QWidget* parent=Q_NULLPTR, Event* event = Q_NULLPTR);
+    Event* currEvent;
 
 public slots:
     void modify(QMouseEvent *event);
-    void cancelHighlight();
 
 signals:
     void modifySignal(QMouseEvent *event);
 
 protected:
     void mousePressEvent(QMouseEvent *event);
-//    void focusInEvent(QFocusEvent* e);
     void mouseDoubleClickEvent(QMouseEvent *event);
 };
 

@@ -46,7 +46,7 @@ QSqlQuery DB::readEvent() {
 
 void DB::deleteEvent(QString name, QString place, QDateTime startTime, QDateTime endTime, int type) {
     query = QSqlQuery(db);
-    query.prepare("DELETE FROM event WHERE name = :name AND place = :place AND start = :start AND end = :end AND type = :type;");
+    query.prepare("DELETE FROM event WHERE name = :name AND place = :place AND starttime = :start AND endtime = :end AND type = :type;");
     query.bindValue(":name", name);
     query.bindValue(":place", place);
     query.bindValue(":start", startTime.toString());
@@ -67,8 +67,8 @@ void DB::updateEvent(QString name, QString place, QDateTime startTime, QDateTime
         return;
     }
     query = QSqlQuery(db);
-    query.prepare("UPDATE event SET name = :name AND place = :place AND start = :start AND end = :end"
-                  " WHERE  name = :oldname AND place = :oldplace AND start = :oldstart AND end = :oldend AND type = '0';");
+    query.prepare("UPDATE event SET name = :name, place = :place, starttime = :start, endtime = :end"
+                  " WHERE  name = :oldname AND place = :oldplace AND starttime = :oldstart AND endtime = :oldend AND type = 0;");
     query.bindValue(":name", name);
     query.bindValue(":place", place);
     query.bindValue(":start", startTime.toString());

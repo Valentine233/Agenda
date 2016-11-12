@@ -1,7 +1,8 @@
 #include "eventlabel.h"
 
-EventLabel::EventLabel(QWidget* parent) : QLabel(parent)
+EventLabel::EventLabel(QWidget* parent, Event* _event) : QLabel(parent)
 {
+    currEvent = _event;
     QObject::connect(this, SIGNAL(modifySignal(QMouseEvent *)), this, SLOT(modify(QMouseEvent *)));
 
 }
@@ -24,18 +25,12 @@ void EventLabel::mouseDoubleClickEvent(QMouseEvent *event)
     }
 }
 
-//取消高亮
-void EventLabel::cancelHighlight() {
-    ((MainWindow*)parent())->eventsLoseFocus();
-    this->setStyleSheet("EventLabel {background-color: rgba(34, 24, 245, 50); text-align: center; }");
-}
 
 void EventLabel::modify(QMouseEvent *event)
 {
     QPoint pos = mapToParent(event->pos());
-    Event* curr_event =  ((MainWindow*)parent())->findEvent(pos.x(), pos.y());
     OpenNew editWindow((MainWindow*)parent());
     editWindow.setGeometry(pos.x()+50,pos.y()-30,400,240);
     editWindow.setInit(pos.x(), pos.y());
-    editWindow.showCurr(curr_event);
+    editWindow.showCurr(currEvent);
 }

@@ -41,10 +41,7 @@ public slots:
     void sendEdit();
     void sendDelete();
     void deleteTemp();
-    void deleteEventConfirm(QString name, QString place, QDateTime startTime, QDateTime endTime, int type)
-    {
-        emit deleteConfirm(name, place, startTime, endTime, type);
-    }
+    void deleteEventConfirm(QString name, QString place, QDateTime startTime, QDateTime endTime, int type);
 
 private:
     QLineEdit* nameinput = new QLineEdit(this);
