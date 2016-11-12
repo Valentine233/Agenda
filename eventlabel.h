@@ -1,6 +1,7 @@
 #ifndef EVENTLABEL_H
 #define EVENTLABEL_H
 
+#include "opennew.h"
 #include <QObject>
 #include <QWidget>
 #include <QLabel>
@@ -10,12 +11,16 @@
 class EventLabel : public QLabel
 {
     Q_OBJECT
+
 public:
     EventLabel(QWidget* parent=Q_NULLPTR);
+
 public slots:
-    void modify(QMouseEvent*);
+    void modify(QMouseEvent *event);
+
 signals:
-    void modifySignal(QMouseEvent *);
+    void modifySignal(QMouseEvent *event);
+
 protected:
     void mousePressEvent(QMouseEvent *event);
 //    void focusInEvent(QFocusEvent* e);

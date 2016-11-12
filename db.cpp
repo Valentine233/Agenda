@@ -26,7 +26,7 @@ void DB::dropDB() {
 void DB::addEvent(QString name, QString place, QDateTime startTime, QDateTime endTime, int type)
 {
     query = QSqlQuery(db);
-    query.prepare("insert into event (name, place, starttime, endtime, type) values(:name, :place, :start, :end, :type);");
+    query.prepare("INSERT INTO event (name, place, starttime, endtime, type) VALUES(:name, :place, :start, :end, :type);");
     query.bindValue(":name", name);
     query.bindValue(":place", place);
     query.bindValue(":start", startTime.toString());
@@ -42,4 +42,42 @@ QSqlQuery DB::readEvent() {
     query = QSqlQuery(db);
     query.exec("SELECT * FROM event;");
     return query;
+}
+
+void DB::deleteEvent(QString name, QString place, QDateTime startTime, QDateTime endTime, int type) {
+    query = QSqlQuery(db);
+    query.prepare("DELETE FROM event WHERE name = :name AND place = :place AND start = :start AND end = :end AND type = :type;");
+    query.bindValue(":name", name);
+    query.bindValue(":place", place);
+    query.bindValue(":start", startTime.toString());
+    query.bindValue(":end", endTime.toString());
+    query.bindValue(":type", type);
+    if(!query.exec())
+    {
+        qDebug()<<query.lastError();
+    }
+}
+
+void DB::updateEvent(QString name, QString place, QDateTime startTime, QDateTime endTime, int type, QString nameOld, QString placeOld, QDateTime startOld, QDateTime endOld)
+{
+    if(type != 0)
+    {
+        qDebug() << "Can't update others' events\n";
+        return;
+    }
+    query = QSqlQuery(db);
+    query.prepare("UPDATE event SET name = :name AND place = :place AND start = :start AND end = :end"
+                  " WHERE  name = :oldname AND place = :oldplace AND start = :oldstart AND end = :oldend AND type = '0';");
+    query.bindValue(":name", name);
+    query.bindValue(":place", place);
+    query.bindValue(":start", startTime.toString());
+    query.bindValue(":end", endTime.toString());
+    query.bindValue(":oldname", nameOld);
+    query.bindValue(":oldplace", placeOld);
+    query.bindValue(":oldstart", startOld.toString());
+    query.bindValue(":oldend", endOld.toString());
+    if(!query.exec())
+    {
+        qDebug()<<query.lastError();
+    }
 }

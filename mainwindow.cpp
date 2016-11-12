@@ -277,6 +277,64 @@ void MainWindow::createNewEvent(QString name, QString place, QDateTime starttime
     turnToEventTime(event);
 }
 
+Event* MainWindow::findEvent(QMouseEvent *event)
+{
+    int x = event->x();
+    int y = event->y();
+    QTime eventTime((y- topY)/(gridHight/2), (y- topY)%(gridHight/2)/((gridHight/4))*30);
+    QString weekStrings[7] = {"周一","周二","周三","周四","周五","周六","周日"};
+    QString currDay = curr_time.toString("ddd");
+    int d;
+    for (d=0;d<7;d++) {
+        if (weekStrings[d] == currDay)
+            break;
+    }
+    QDate eventDay = curr_time.date().addDays((x-leftX)/(gridWidth*2)-d);
+    for(int k = 0; k < mylist->size(); k++)
+    {
+        if (mylist->at(k)->eventStart.date() ==  eventDay && mylist->at(k)->eventStart.time()<=eventTime
+                && mylist->at(k)->eventEnd.time()>=eventTime && mylist->at(k)->eventType == 0)
+        {
+            return mylist->at(k);
+        }
+    }
+}
+
+void MainWindow::editEvent(QString name, QString place, QDateTime starttime, QDateTime endtime, int type, QString nameOld, QString placeOld, QDateTime startOld, QDateTime endOld)
+{
+    for(int k = 0; k < mylist->size(); k++)
+    {
+        if (mylist->at(k)->eventName == nameOld && mylist->at(k)->eventPlace == placeOld && mylist->at(k)->eventStart == startOld
+                && mylist->at(k)->eventEnd == endOld && mylist->at(k)->eventType == type)
+        {
+            mylist->at(k)->eventName = name;
+            mylist->at(k)->eventPlace = place;
+            mylist->at(k)->eventStart = starttime;
+            mylist->at(k)->eventEnd = endtime;
+            refreshAgenda(offset);
+
+            //从数据库里更新
+            db->updateEvent(name, place, starttime, endtime, type, nameOld, placeOld, startOld, endOld);
+        }
+    }
+}
+
+void MainWindow::deleteEvent(QString name, QString place, QDateTime starttime, QDateTime endtime, int type)
+{
+    for(int k = 0; k < mylist->size(); k++)
+    {
+        if (mylist->at(k)->eventName == name && mylist->at(k)->eventPlace == place && mylist->at(k)->eventStart == starttime
+                && mylist->at(k)->eventEnd == endtime && mylist->at(k)->eventType == type)
+        {
+            mylist->removeAt(k);
+            refreshAgenda(offset);
+
+            //从数据库删除
+            db->deleteEvent(name, place, starttime, endtime, type);
+        }
+    }
+}
+
 void MainWindow::loadFromDB() {
 
     QSqlQuery query = db->readEvent();
@@ -306,6 +364,7 @@ void MainWindow::eventsLoseFocus() {
         }
     }
 }
+
 void MainWindow::mousePressEvent(QMouseEvent *event) {
     eventsLoseFocus();
     event->accept();

@@ -8,9 +8,6 @@ void AddEvent(QString, QString, QString, QString);
 OpenNew::OpenNew(QWidget* parent):QDialog(parent)
 {
     setWindowTitle("New");
-    QDateTime start(QDate(2016,11,11),QTime(11,11,11));
-    QDateTime end(QDate(2016,12,12),QTime(12,12,12));
-//    addNewEvent("sleep", "bed", start, end, 0);
 }
 
 void OpenNew::setInit(int x, int y)
@@ -114,27 +111,68 @@ void OpenNew::setInit(int x, int y)
 
     }
 
-    QPushButton* addButton = new QPushButton(this);
     addButton->setText("添加");
     addButton->setGeometry(QRect(300,210,40,20));
     addButton->setStyleSheet("QPushButton {color: black;}");
 
     QObject::connect(timechoise, SIGNAL(buttonPressed(int)), this, SLOT(TimeChoose(int)));
-    QObject::connect(addButton, SIGNAL(clicked(bool)), this, SLOT(send()));
-    QObject::connect(this, SIGNAL(trans(QString, QString, QDateTime, QDateTime, int)), this->parent(), SLOT(createNewEvent(QString, QString, QDateTime, QDateTime, int)));
-    QObject::connect(this, SIGNAL(trans(QString, QString, QDateTime, QDateTime, int)), this, SLOT(close()));
+    QObject::connect(addButton, SIGNAL(clicked(bool)), this, SLOT(sendAdd()));
+    QObject::connect(this, SIGNAL(transAdd(QString, QString, QDateTime, QDateTime, int)), this->parent(),
+                     SLOT(createNewEvent(QString,QString,QDateTime, QDateTime, int)));
+    QObject::connect(this, SIGNAL(transAdd(QString, QString, QDateTime, QDateTime, int)), this, SLOT(close()));
+
+    confirmButton->setText("确认");
+    confirmButton->setGeometry(QRect(300,210,40,20));
+    confirmButton->setStyleSheet("QPushButton {color: black;}");
+    confirmButton->hide();
+
+    QObject::connect(confirmButton, SIGNAL(clicked(bool)), this, SLOT(sendEdit()));
+    QObject::connect(this, SIGNAL(transEdit(QString, QString, QDateTime, QDateTime, int, QString, QString, QDateTime, QDateTime)),
+                     this->parent(), SLOT(editEvent(QString, QString, QDateTime, QDateTime, int, QString, QString, QDateTime, QDateTime)));
+    QObject::connect(this, SIGNAL(transEdit(QString, QString, QDateTime, QDateTime, int, QString, QString, QDateTime, QDateTime)),
+                     this, SLOT(close()));
+
+    deleteButton->setText("删除");
+    deleteButton->setGeometry(QRect(200,210,40,20));
+    deleteButton->setStyleSheet("QPushButton {color: black;}");
+    deleteButton->hide();
+
+    QObject::connect(deleteButton, SIGNAL(clicked(bool)), this, SLOT(sendDelete()));
+    QObject::connect(this, SIGNAL(transDelete(QString,QString,QDateTime,QDateTime,int)),
+                     this, SLOT(deleteEventConfirm(QString, QString, QDateTime, QDateTime, int)));
+    QObject::connect(this, SIGNAL(deleteConfirm(QString,QString,QDateTime,QDateTime,int)),
+                     this->parent(), SLOT(deleteEvent(QString, QString, QDateTime, QDateTime, int)));
+    QObject::connect(this, SIGNAL(deleteConfirm(QString,QString,QDateTime,QDateTime,int)),
+                     this, SLOT(close()));
 
     // build a temp event
     Event *tempEvent = new Event("未命名","",QDateTime(dateEdit->date(), starttime->dateTime().time()),QDateTime(dateEdit->date(), endtime->dateTime().time()),0,this);
     ((MainWindow*)this->parent())->tempUI = ((MainWindow*)this->parent())->addEventUI(tempEvent);
 }
 
-void OpenNew::send() //myevent: type = 0,   yourevent: type = 1
+void OpenNew::sendAdd() //myevent: type = 0,   yourevent: type = 1
 {
     QDateTime start(dateEdit->date(), starttime->dateTime().time());
     QDateTime end(dateEdit->date(), endtime->dateTime().time());
     deleteTemp();
-    emit trans(nameinput->text(), placeinput->text(), start, end, 0);
+    emit transAdd(nameinput->text(), placeinput->text(), start, end, 0);
+}
+
+void OpenNew::sendEdit()
+{
+    QDateTime start(dateEdit->date(), starttime->dateTime().time());
+    QDateTime end(dateEdit->date(), endtime->dateTime().time());
+
+    QDateTime startOld(dateOld, starttimeOld);
+    QDateTime endOld(dateOld, endtimeOld);
+    emit transEdit(nameinput->text(), placeinput->text(), start, end, 0, nameOld, placeOld, startOld, endOld);
+}
+
+void OpenNew::sendDelete()
+{
+    QDateTime start(dateEdit->date(), starttime->dateTime().time());
+    QDateTime end(dateEdit->date(), endtime->dateTime().time());
+    emit transDelete(nameinput->text(), placeinput->text(), start, end, 0);
 }
 
 void OpenNew::deleteTemp()
@@ -142,7 +180,6 @@ void OpenNew::deleteTemp()
     if (((MainWindow*)this->parent())->tempUI != NULL) {
         delete ((MainWindow*)this->parent())->tempUI;
         ((MainWindow*)this->parent())->tempUI = NULL;
-
     }
 }
 
@@ -174,24 +211,31 @@ void OpenNew::TimeChoose(int id)
 
 }
 
-void OpenNew::addNewEvent(QString name, QString place, QDateTime starttime, QDateTime endtime, int type)
+void OpenNew::showCurr(Event *event)
 {
-
-    Event *event = new Event(name, place, starttime, endtime, type, this);
-    MainWindow::mylist->append(event);
-//    DB::db.open();
-//    DB::AddEvent(name, place, starttime.toString("yyyy.MM.dd HH:mm:ss"), endtime.toString("yyyy.MM.dd HH:mm:ss"));
-//    DB::query.exec("select * from myevent where name = sleep");
-//    if (DB::query.next())
-//    {
-//         qDebug()<< DB::query.value(0).toInt()<<"\n";
-//         qDebug()<< DB::query.value(1).toString()<<"\n";
-//         qDebug()<< DB::query.value(2).toString()<<"\n";
-//         qDebug()<< DB::query.value(3).toDateTime()<<"\n";
-//         qDebug()<< DB::query.value(4).toDateTime()<<"\n";
-//         qDebug()<< DB::query.value(5).toInt()<<"\n";
-//     }
+    qDebug() << event->eventName << event->eventPlace  << event->eventStart.date() << event->eventStart.time()<<"\n";
+    setWindowTitle("Edit");
+    qDebug() << "1" << "\n";
+    nameinput->setText(event->eventName);
+    nameOld = event->eventName;
+    placeinput->setText(event->eventPlace);
+    placeOld = event->eventPlace;
+    dateEdit->setDate(event->eventStart.date());
+    dateOld = event->eventStart.date();
+    starttime->setTime(event->eventStart.time());
+    starttimeOld = event->eventStart.time();
+    endtime->setTime(event->eventEnd.time());
+    endtimeOld = event->eventEnd.time();
+    qDebug() << "2" << "\n";
+    addButton->hide();
+    confirmButton->show();
+    deleteButton->show();
+    this->exec();
 
 }
 
+void deleteEventConfirm(QString, QString, QDateTime, QDateTime, int)
+{
+    QMessageBox::information(NULL, "Delete", "Are you sure to delete the event?", QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+}
 

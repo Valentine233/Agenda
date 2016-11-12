@@ -15,6 +15,7 @@
 #include <QPushButton>
 #include <QCheckBox>
 #include <QList>
+#include <QMessageBox>
 
 class OpenNew : public QDialog
 {
@@ -23,15 +24,27 @@ class OpenNew : public QDialog
 public:
     OpenNew(QWidget* parent=Q_NULLPTR);
     void setInit(int, int);
+    void showCurr(Event *);
+    QPushButton* addButton = new QPushButton(this);
+    QPushButton* confirmButton = new QPushButton(this);
+    QPushButton* deleteButton = new QPushButton(this);
 
 signals:
-    void trans(QString, QString, QDateTime, QDateTime, int);
+    void transAdd(QString, QString, QDateTime, QDateTime, int);
+    void transEdit(QString, QString, QDateTime, QDateTime, int, QString, QString, QDateTime, QDateTime);
+    void transDelete(QString, QString, QDateTime, QDateTime, int);
+    void deleteConfirm(QString, QString, QDateTime, QDateTime, int);
 
 public slots:
     void TimeChoose(int id);
-    void addNewEvent(QString, QString, QDateTime, QDateTime, int);
-    void send();
+    void sendAdd();
+    void sendEdit();
+    void sendDelete();
     void deleteTemp();
+    void deleteEventConfirm(QString name, QString place, QDateTime startTime, QDateTime endTime, int type)
+    {
+        emit deleteConfirm(name, place, startTime, endTime, type);
+    }
 
 private:
     QLineEdit* nameinput = new QLineEdit(this);
@@ -45,6 +58,18 @@ private:
     QDateTimeEdit *enddate = new QDateTimeEdit(QDate::currentDate(),this);
     QLabel* start1 = new QLabel(this);
     QLabel* end1 = new QLabel(this);
+
+    QString nameOld;
+    QString placeOld;
+
+    QDate dateOld;
+    QTime starttimeOld;
+    QTime endtimeOld;
+
+    QDateTime startdateOld;
+    QDateTime enddateOld;
+
+
 protected:
     void closeEvent(QCloseEvent *event);
 };
