@@ -6,7 +6,7 @@
 #include <QWidget>
 #include <QLabel>
 #include "eventlabel.h"
-
+class EventLabel;
 class Event : public QWidget
 {
 public:

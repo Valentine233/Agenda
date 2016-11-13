@@ -7,15 +7,14 @@
 #include <QMouseEvent>
 #include <QFocusEvent>
 #include "event.h"
-
+class Event;
 class EventLabel : public QLabel
 {
     Q_OBJECT
 
 public:
-    EventLabel(QWidget* parent=Q_NULLPTR, Event* event = Q_NULLPTR, QLabel* label = Q_NULLPTR);
+    EventLabel(QWidget* parent=Q_NULLPTR, Event* event = Q_NULLPTR);
     Event* currEvent;
-    QLabel* rightLabel;
 
 protected:
     virtual void mousePressEvent(QMouseEvent *event) = 0;

@@ -58,6 +58,7 @@ public:
     const static int bottomY = topY + 12 * gridHight;
     DB* db;
     void eventsLoseFocus();
+    QLabel* detailLabel;
 
 signals:
     void openNewSignal(QMouseEvent *);

@@ -76,6 +76,8 @@ void MainWindow::setinit()
     list = new QList<Event*>();
     //yourlist = new QList<Event*>();
 
+    detailLabel = new QLabel(this);
+
     // Read settings
     Event::defaultDuration = 60;
 }
@@ -133,8 +135,7 @@ EventLabel* MainWindow::addEventUI(Event *event)
         {
             if(event->eventType == 0)
             {
-                QLabel* label = new QLabel(this);
-                MyEventLabel* eventRect = new MyEventLabel(this, event, label);
+                MyEventLabel* eventRect = new MyEventLabel(this, event);
                 eventRect->setGeometry(50+100*j,100+480*startminute/(24*60),50,480*(endminute-startminute)/(24*60));
                 eventRect->setText(event->eventName+"\n"+event->eventPlace);
                 event->eventUI = eventRect;
@@ -143,7 +144,7 @@ EventLabel* MainWindow::addEventUI(Event *event)
             else if(event->eventType == 1)
             {
                 QLabel* label = new QLabel(this);
-                YourEventLabel* eventRect = new YourEventLabel(this, event, label);
+                YourEventLabel* eventRect = new YourEventLabel(this, event);
                 eventRect->setGeometry(100+100*j,100+480*startminute/(24*60),50,480*(endminute-startminute)/(24*60));
                 eventRect->setText(event->eventName+"\n"+event->eventPlace);
                 event->eventUI = eventRect;
@@ -343,7 +344,7 @@ void MainWindow::eventsLoseFocus()
                  list->at(k)->eventUI->setStyleSheet("background-color: rgba(34, 24, 245, 50);text-align: center; ");
              else if(list->at(k)->eventType == 1)
                  list->at(k)->eventUI->setStyleSheet("background-color: rgba(240, 54, 60, 50);text-align: center; ");
-             list->at(k)->eventUI->rightLabel = NULL;
+//             list->at(k)->eventUI->rightLabel = NULL;
         }
     }
 }

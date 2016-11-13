@@ -13,7 +13,7 @@ class MyEventLabel : public EventLabel
     Q_OBJECT
 
 public:
-    MyEventLabel(QWidget* parent=Q_NULLPTR, Event* event = Q_NULLPTR, QLabel* label = Q_NULLPTR);
+    MyEventLabel(QWidget* parent=Q_NULLPTR, Event* event = Q_NULLPTR);
 
 public slots:
     void modify(QMouseEvent *event);

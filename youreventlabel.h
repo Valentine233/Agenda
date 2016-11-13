@@ -13,7 +13,7 @@ class YourEventLabel : public EventLabel
     Q_OBJECT
 
 public:
-    YourEventLabel(QWidget* parent=Q_NULLPTR, Event* event = Q_NULLPTR, QLabel* label = Q_NULLPTR);
+    YourEventLabel(QWidget* parent=Q_NULLPTR, Event* event = Q_NULLPTR);
 
 protected:
     void mousePressEvent(QMouseEvent *event);
