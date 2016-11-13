@@ -6,16 +6,16 @@
 #include <QLabel>
 #include <QMouseEvent>
 #include <QFocusEvent>
-#include <event.h>
-
+#include "event.h"
 
 class EventLabel : public QLabel
 {
     Q_OBJECT
 
 public:
-    EventLabel(QWidget* parent=Q_NULLPTR, Event* event = Q_NULLPTR);
+    EventLabel(QWidget* parent=Q_NULLPTR, Event* event = Q_NULLPTR, QLabel* label = Q_NULLPTR);
     Event* currEvent;
+    QLabel* rightLabel;
 
 protected:
     virtual void mousePressEvent(QMouseEvent *event) = 0;

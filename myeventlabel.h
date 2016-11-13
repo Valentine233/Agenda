@@ -1,6 +1,7 @@
 #ifndef MYEVENTLABEL_H
 #define MYEVENTLABEL_H
 #include "eventlabel.h"
+#include "event.h"
 #include "mainwindow.h"
 #include "opennew.h"
 #include <QMenu>
@@ -12,7 +13,7 @@ class MyEventLabel : public EventLabel
     Q_OBJECT
 
 public:
-    MyEventLabel(QWidget* parent=Q_NULLPTR, Event* event = Q_NULLPTR);
+    MyEventLabel(QWidget* parent=Q_NULLPTR, Event* event = Q_NULLPTR, QLabel* label = Q_NULLPTR);
 
 public slots:
     void modify(QMouseEvent *event);

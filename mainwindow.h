@@ -71,7 +71,7 @@ public slots:
     void createNewEvent(QString, QString, QDateTime, QDateTime, int);
     void editEvent(QString, QString, QDateTime, QDateTime, int, QString, QString, QDateTime, QDateTime);
     void deleteEvent(QString, QString, QDateTime, QDateTime, int);
-    QLabel* addEventUI(Event *);
+    EventLabel* addEventUI(Event *);
     void loadFromDB();
     void writeToFile();
     void readFromFile();

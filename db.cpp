@@ -18,7 +18,8 @@ DB::DB()
                "type INTEGER NOT NULL);");
 }
 
-void DB::dropDB() {
+void DB::dropDB()
+{
     query = QSqlQuery(db);
     query.exec("DROP TABLE IF EXISTS event;");
 }
@@ -33,7 +34,8 @@ void DB::addEvent(QString name, QString place, QDateTime startTime, QDateTime en
     query.bindValue(":end", endTime.toString());
     query.bindValue(":type", type);
     bool success = query.exec();
-    if (!success) {
+    if (!success)
+    {
         qDebug()<<query.lastError();
     }
 }

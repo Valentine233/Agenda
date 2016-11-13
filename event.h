@@ -5,6 +5,7 @@
 #include <QDateTime>
 #include <QWidget>
 #include <QLabel>
+#include "eventlabel.h"
 
 class Event : public QWidget
 {
@@ -16,7 +17,7 @@ public:
     QDateTime eventStart;
     QDateTime eventEnd;
     int eventType;
-    QLabel *eventUI = NULL;
+    EventLabel *eventUI = NULL;
 
     // in minute
     static int defaultDuration;

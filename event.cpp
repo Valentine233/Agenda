@@ -9,7 +9,5 @@ Event::Event(QString name, QString place, QDateTime starttime, QDateTime endtime
     eventPlace = place;
     eventStart = starttime;
     eventEnd = endtime;
-    //eventStart = starttime.toString("yyyy.MM.dd HH:mm:ss");
-    //eventEnd = endtime.toString("yyyy.MM.dd HH:mm:ss");
     eventType = type;
 }

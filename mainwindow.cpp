@@ -120,7 +120,7 @@ void MainWindow::paintEvent(QPaintEvent *)
     painter->end();
 }
 
-QLabel* MainWindow::addEventUI(Event *event)
+EventLabel* MainWindow::addEventUI(Event *event)
 {
     QString weekStrings[7] = {"周一","周二","周三","周四","周五","周六","周日"};
     QString weekStart = event->eventStart.toString("ddd");
@@ -133,7 +133,8 @@ QLabel* MainWindow::addEventUI(Event *event)
         {
             if(event->eventType == 0)
             {
-                MyEventLabel* eventRect = new MyEventLabel(this, event);
+                QLabel* label = new QLabel(this);
+                MyEventLabel* eventRect = new MyEventLabel(this, event, label);
                 eventRect->setGeometry(50+100*j,100+480*startminute/(24*60),50,480*(endminute-startminute)/(24*60));
                 eventRect->setText(event->eventName+"\n"+event->eventPlace);
                 event->eventUI = eventRect;
@@ -141,7 +142,8 @@ QLabel* MainWindow::addEventUI(Event *event)
             }
             else if(event->eventType == 1)
             {
-                YourEventLabel* eventRect = new YourEventLabel(this, event);
+                QLabel* label = new QLabel(this);
+                YourEventLabel* eventRect = new YourEventLabel(this, event, label);
                 eventRect->setGeometry(100+100*j,100+480*startminute/(24*60),50,480*(endminute-startminute)/(24*60));
                 eventRect->setText(event->eventName+"\n"+event->eventPlace);
                 event->eventUI = eventRect;
@@ -336,8 +338,12 @@ void MainWindow::eventsLoseFocus()
 {
     for(int k = 0; k < list->size(); k++)
     {
-        if (list->at(k)->eventUI != NULL && list->at(k)->eventType == 0) {
-            list->at(k)->eventUI->setStyleSheet("background-color: rgba(34, 24, 245, 50);text-align: center; ");
+        if (list->at(k)->eventUI != NULL) {
+             if(list->at(k)->eventType == 0)
+                 list->at(k)->eventUI->setStyleSheet("background-color: rgba(34, 24, 245, 50);text-align: center; ");
+             else if(list->at(k)->eventType == 1)
+                 list->at(k)->eventUI->setStyleSheet("background-color: rgba(240, 54, 60, 50);text-align: center; ");
+             list->at(k)->eventUI->rightLabel = NULL;
         }
     }
 }

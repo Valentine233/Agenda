@@ -1,8 +1,9 @@
 #include "myeventlabel.h"
 
-MyEventLabel::MyEventLabel(QWidget* parent, Event* _event) : EventLabel(parent)
+MyEventLabel::MyEventLabel(QWidget* parent, Event* _event, QLabel* _label) : EventLabel(parent)
 {
     currEvent = _event;
+    rightLabel = _label;
     this->setStyleSheet("background-color: rgba(34, 24, 245, 50);text-align: center; ");
     QFont font = this->font();
     font.setPointSize(10);
@@ -19,6 +20,12 @@ void MyEventLabel::mousePressEvent(QMouseEvent *event) {
     {
         ((MainWindow*)parent())->eventsLoseFocus();
         this->setStyleSheet("EventLabel {background-color: rgba(34, 24, 245, 90); text-align: center; }");
+        rightLabel->setGeometry(800,0,200,600);
+        rightLabel->setText("事件名称：  "+currEvent->eventName+"\n"+"事件地点：  "+currEvent->eventPlace+"\n"
+                            +"事件日期： "+currEvent->eventStart.date().toString("yyyy/MM/dd")+"\n"
+                            +"开始时间： "+currEvent->eventStart.time().toString("HH:mm")+"\n"
+                            +"结束时间： "+currEvent->eventEnd.time().toString("HH:mm"));
+        rightLabel->show();
         event->accept();
     }
     //右键，编辑或删除

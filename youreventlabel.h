@@ -2,6 +2,7 @@
 #define YOUREVENTLABEL_H
 
 #include "eventlabel.h"
+#include "event.h"
 #include "mainwindow.h"
 #include "opennew.h"
 #include <QMenu>
@@ -12,7 +13,7 @@ class YourEventLabel : public EventLabel
     Q_OBJECT
 
 public:
-    YourEventLabel(QWidget* parent=Q_NULLPTR, Event* event = Q_NULLPTR);
+    YourEventLabel(QWidget* parent=Q_NULLPTR, Event* event = Q_NULLPTR, QLabel* label = Q_NULLPTR);
 
 protected:
     void mousePressEvent(QMouseEvent *event);
