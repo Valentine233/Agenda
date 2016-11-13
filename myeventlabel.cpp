@@ -1,15 +1,16 @@
 #include "myeventlabel.h"
-
 MyEventLabel::MyEventLabel(QWidget* parent, Event* _event) : EventLabel(parent)
 {
     currEvent = _event;
     this->setStyleSheet("background-color: rgba(34, 24, 245, 50);text-align: center; ");
+    this->setStyleSheet(((MainWindow*)this->parent())->myColorDefault);
     QFont font = this->font();
     font.setPointSize(10);
     this->setFont(font);
     this->setAlignment(Qt::AlignCenter);
     this->show();
     QObject::connect(this, SIGNAL(modifySignal(QMouseEvent *)), this, SLOT(modify(QMouseEvent *)));
+    QObject::connect(this, SIGNAL(showDetailSignal(Event*)), (MainWindow*)this->parent(), SLOT(showDetail(Event*)));
 }
 
 //点击一次
@@ -18,7 +19,8 @@ void MyEventLabel::mousePressEvent(QMouseEvent *event) {
     if(event->button() == Qt::LeftButton)
     {
         ((MainWindow*)parent())->eventsLoseFocus();
-        this->setStyleSheet("EventLabel {background-color: rgba(34, 24, 245, 90); text-align: center; }");
+        this->setStyleSheet(((MainWindow*)this->parent())->myColorFocus);
+        emit showDetailSignal(currEvent);
         event->accept();
     }
     //右键，编辑或删除
@@ -26,6 +28,7 @@ void MyEventLabel::mousePressEvent(QMouseEvent *event) {
     {
         ((MainWindow*)parent())->eventsLoseFocus();
         this->setStyleSheet("EventLabel {background-color: rgba(34, 24, 245, 90); text-align: center; }");
+        this->setStyleSheet(((MainWindow*)this->parent())->myColorDefault);
         event->accept();
 //        ((MainWindow*)parent())->eventsLoseFocus();
 //        this->setStyleSheet("EventLabel {background-color: rgba(34, 24, 245, 90); text-align: center; }");

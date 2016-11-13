@@ -59,7 +59,10 @@ public:
     DB* db;
     void eventsLoseFocus();
     QLabel* detailLabel;
-
+    QString myColorDefault = "MyEventLabel {background-color: rgba(173,210,255,0.8); color: #333333}";
+    QString myColorFocus = "MyEventLabel {background-color: rgba(108,174,255,0.8); color:white}";
+    QString yourColorDefault = "YourEventLabel {background-color: rgba(173,210,255,0.8); color: #333333}";
+    QString yourColorFocus = "YourEventLabel {background-color: rgba(108,174,255,0.8); color:white}";
 signals:
     void openNewSignal(QMouseEvent *);
 
@@ -76,6 +79,7 @@ public slots:
     void loadFromDB();
     void writeToFile();
     void readFromFile();
+    void showDetail(Event*);
 
 
 private:

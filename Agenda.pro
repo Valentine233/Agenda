@@ -33,3 +33,6 @@ HEADERS  += mainwindow.h \
 FORMS    += mainwindow.ui
 
 QT += sql
+
+RESOURCES += \
+    style.qrc

@@ -2,13 +2,12 @@
 
 QFile MyEventList("/Users/liaoxuan/QtProjet/Agenda/MyEventList.txt");
 QFile YourEventList("/Users/liaoxuan/QtProjet/Agenda/YourEventList.txt");
-
+QString myColorDefault = "MyEventLabel {background-color: #add2ff}";
+QString myColorFocus = "MyEventLabel {background-color: #6caeff}";
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
-//    QTextStream MyEvent(&MyEventList);
-//    QTextStream YourEvent(&YourEventList);
     ui->setupUi(this);
     setinit();
     setWindowStyle();
@@ -33,39 +32,51 @@ void MainWindow::setinit()
 {
     // create a new general event
     QPushButton *create = new QPushButton ( "新事件", this);
-    create->setGeometry(800,100,100,40);
+    create->setGeometry(QRect(800,100,100,40));
+//    create->setFlat(true);
+//    create->setIcon();
     connect(create, SIGNAL(clicked(bool)), this, SLOT(openGeneralNew()));
-
     // to next week
     QPushButton *forward_button = new QPushButton ( ">", this);
-    forward_button->setGeometry(750,60,20,20);
+//    forward_button->setFlat(true);
+//    QPixmap forward_pixmap(":icon/forward");
+//    QIcon forwardIcon(forward_pixmap);
+//    forward_button->setIcon(forwardIcon);
+//    forward_button->setIconSize(QSize(30,30));
+    forward_button->setGeometry(QRect(130,20,50,30));
     connect(forward_button, SIGNAL(clicked(bool)), this, SLOT(forward()));
     // to last week
     QPushButton *backwards_button = new QPushButton ( "<", this);
-    backwards_button->setGeometry(30,60,20,20);
+    backwards_button->setGeometry(QRect(30,20,50,30));
+//    backwards_button->setFlat(true);
+//    QPixmap back_pixmap(":icon/back");
+//    QIcon backIcon(back_pixmap);
+//    backwards_button->setIcon(backIcon);
     connect(backwards_button, SIGNAL(clicked(bool)), this, SLOT(backwards()));
     // back to the current week
     QPushButton *current = new QPushButton ( "今天", this);
-    current->setGeometry(QRect(80,25,65,30));
+//    current->setFlat(true);
+    current->setGeometry(QRect(70,20,70,30));
     connect(current, SIGNAL(clicked(bool)), this, SLOT(currentTime()));
 
     int i;
     //add the vertical time zone
-    for(i=0; i<13; i++)
+    for(i=1; i<12; i++)
     {
         QString s = QString::number(2*i);
         QLabel *label = new QLabel(this);
         label->setText(s);
+        label->setStyleSheet("color: #787878;");
         label->setAlignment(Qt::AlignCenter);
         label->setGeometry(QRect(0, 80+40*i, 50, 40));
     }
 
-    QFont font("Times", 25);
+    QFont font("Helvetica", 60);
     month->setFont(font);
+    month->setStyleSheet("color: #444444");
     month->setAlignment(Qt::AlignCenter);
-    month->setGeometry(QRect(2,20,100,50));
+    month->setGeometry(QRect(rightX + 60,40,100,50));
     for (int i=0; i<7; i++) {
-
         QLabel *weekLabel = new QLabel(this);
         weekLabels[i] = weekLabel;
         QLabel *dayLabel = new QLabel(this);
@@ -77,6 +88,7 @@ void MainWindow::setinit()
     //yourlist = new QList<Event*>();
 
     detailLabel = new QLabel(this);
+    detailLabel->setGeometry(rightX+20,topY,100,300);
 
     // Read settings
     Event::defaultDuration = 60;
@@ -85,7 +97,7 @@ void MainWindow::setinit()
 void MainWindow::setWindowStyle() {
     this->setStyleSheet("MainWindow {background-color:#fff;}");
     //this->setStyleSheet("MainWindow {background-color:#fff;} QLabel {color:#888;}");
-    this->setFixedSize(rightX+250,bottomY+40);
+    this->setFixedSize(rightX+250,bottomY+20);
 
 }
 
@@ -110,13 +122,13 @@ void MainWindow::paintEvent(QPaintEvent *)
         divide[i] = QLine(leftX+gridWidth*(2*i+1),topY,leftX+gridWidth*(2*i+1),bottomY);
     }
 
-    painter->setPen(Qt::gray);
+    painter->setPen(QColor(200,200,200,100));
     painter->drawLines(hlines, 13);
     painter->drawLines(vlines, 8);
 
     QPen pen;
     pen.setStyle(Qt::DotLine);
-    pen.setBrush(Qt::lightGray);
+    pen.setBrush(QColor(230,230,230,100));
     painter->setPen(pen);
     painter->drawLines(divide, 7);
     painter->end();
@@ -143,7 +155,6 @@ EventLabel* MainWindow::addEventUI(Event *event)
             }
             else if(event->eventType == 1)
             {
-                QLabel* label = new QLabel(this);
                 YourEventLabel* eventRect = new YourEventLabel(this, event);
                 eventRect->setGeometry(100+100*j,100+480*startminute/(24*60),50,480*(endminute-startminute)/(24*60));
                 eventRect->setText(event->eventName+"\n"+event->eventPlace);
@@ -187,16 +198,22 @@ void MainWindow::refreshAgenda(int _offset)
     //week information
     for(int i=0; i<7; i++)
     {
+//        QPalette pe_defalt;
+//        pe_defalt.setColor(QPalette::WindowText, QColor(81,81,81,100));
+//        QPalette pe;
+//        pe.setColor(QPalette::WindowText,QColor(0,0,0,100));
+
+        QLabel *dayLabel = dayLabels[i];
+        dayLabel->setStyleSheet("color: #666666");
         QLabel *weekLabel = weekLabels[i];
         weekLabel->setAlignment(Qt::AlignCenter);
         weekLabel->setText(weekStrings[i]);
-        weekLabel->setGeometry(QRect(77+100*i, 45, 40, 30));
+        weekLabel->setGeometry(QRect(77+100*i, 50, 40, 30));
+        weekLabel->setFont(QFont("Helvetica", 10));
+        weekLabel->setStyleSheet("color: #aaaaaa");
         if( weekStrings[i] == curr_time.toString("ddd") )
         {
-            QPalette pe_defalt;
-            pe_defalt.setColor(QPalette::WindowText,Qt::black);
-            QPalette pe;
-            pe.setColor(QPalette::WindowText,Qt::red);
+
 
             //month information
             month->setText(curr_time.addDays(-i).toString("M"));
@@ -206,14 +223,18 @@ void MainWindow::refreshAgenda(int _offset)
                 QLabel *dayLabel = dayLabels[j];
                 dayLabel->setText(curr_time.addDays(j-i).toString("d"));
                 dayLabel->setAlignment(Qt::AlignCenter);
-                dayLabel->setGeometry(QRect(77+100*j, 70, 40, 15));
+                dayLabel->setGeometry(QRect(77+100*j, 75, 40, 25));
+                dayLabel->setFont(QFont("Helvetica", 24));
+
                 if (j==i && offset!=0) {
-                    dayLabel->setPalette(pe_defalt);
-                    weekLabel->setPalette(pe_defalt);
+                    dayLabel->setStyleSheet("color: #666666");
+//                    dayLabel->setPalette(pe_defalt);
+//                    weekLabel->setPalette(pe_defalt);
                 }
                 if(j==i && offset == 0) {
-                    dayLabel->setPalette(pe);
-                    weekLabel->setPalette(pe);
+                    dayLabel->setStyleSheet("color: #B30A1E");
+//                    dayLabel->setPalette(pe);
+//                    weekLabel->setPalette(pe);
                 }
             }
         }
@@ -334,17 +355,17 @@ void MainWindow::loadFromDB()
        list->append(event);
     }
 }
-
 void MainWindow::eventsLoseFocus()
 {
     for(int k = 0; k < list->size(); k++)
     {
         if (list->at(k)->eventUI != NULL) {
              if(list->at(k)->eventType == 0)
-                 list->at(k)->eventUI->setStyleSheet("background-color: rgba(34, 24, 245, 50);text-align: center; ");
+                 list->at(k)->eventUI->setStyleSheet(myColorDefault);
              else if(list->at(k)->eventType == 1)
-                 list->at(k)->eventUI->setStyleSheet("background-color: rgba(240, 54, 60, 50);text-align: center; ");
+                 list->at(k)->eventUI->setStyleSheet(myColorDefault);
 //             list->at(k)->eventUI->rightLabel = NULL;
+             detailLabel->hide();
         }
     }
 }
@@ -440,4 +461,8 @@ void MainWindow::readFromFile() //接收对方文件时
         int type = 1; //储存为1事件
         createNewEvent(Name, Place, starttime, endtime, type);
     }
+}
+void MainWindow::showDetail(Event* event) {
+    detailLabel->setText(event->eventName);
+    detailLabel->show();
 }
