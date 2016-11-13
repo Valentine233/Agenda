@@ -3,12 +3,12 @@
 YourEventLabel::YourEventLabel(QWidget* parent, Event* _event) : EventLabel(parent)
 {
     currEvent = _event;
-    eventRect->setStyleSheet("background-color: rgba(235, 34, 145, 50);text-align: center; ");
-    QFont font = eventRect->font();
+    this->setStyleSheet("background-color: rgba(235, 34, 145, 50);text-align: center; ");
+    QFont font = this->font();
     font.setPointSize(10);
-    eventRect->setFont(font);
-    eventRect->setAlignment(Qt::AlignCenter);
-    eventRect->show();
+    this->setFont(font);
+    this->setAlignment(Qt::AlignCenter);
+    this->show();
 }
 
 //点击一次

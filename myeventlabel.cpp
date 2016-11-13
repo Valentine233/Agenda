@@ -4,7 +4,7 @@ MyEventLabel::MyEventLabel(QWidget* parent, Event* _event) : EventLabel(parent)
 {
     currEvent = _event;
     this->setStyleSheet("background-color: rgba(34, 24, 245, 50);text-align: center; ");
-    QFont font = eventRect->font();
+    QFont font = this->font();
     font.setPointSize(10);
     this->setFont(font);
     this->setAlignment(Qt::AlignCenter);
@@ -24,6 +24,9 @@ void MyEventLabel::mousePressEvent(QMouseEvent *event) {
     //右键，编辑或删除
     else if(event->button() == Qt::RightButton)
     {
+        ((MainWindow*)parent())->eventsLoseFocus();
+        this->setStyleSheet("EventLabel {background-color: rgba(34, 24, 245, 90); text-align: center; }");
+        event->accept();
 //        ((MainWindow*)parent())->eventsLoseFocus();
 //        this->setStyleSheet("EventLabel {background-color: rgba(34, 24, 245, 90); text-align: center; }");
 

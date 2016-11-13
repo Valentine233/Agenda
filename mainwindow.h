@@ -1,11 +1,6 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include "myeventlabel.h"
-#include "youreventlabel.h"
-#include "db.h"
-#include "event.h"
-#include "opennew.h"
 #include "ui_mainwindow.h"
 #include <QMainWindow>
 #include <QWidget>
@@ -28,7 +23,12 @@
 #include <QSqlQuery>
 #include <QSqlRecord>
 #include <QFile>
-
+//#include "eventlabel.h"
+#include "myeventlabel.h"
+#include "youreventlabel.h"
+#include "db.h"
+#include "opennew.h"
+#include "event.h"
 namespace Ui {
 class MainWindow;
 }
@@ -86,6 +86,7 @@ private:
     QLabel *dayLabels[7];
     QLabel *weekLabels[7];
     void setWindowStyle();
+
 protected:
     void mousePressEvent(QMouseEvent *event);
     void mouseDoubleClickEvent(QMouseEvent *);

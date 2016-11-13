@@ -2,7 +2,11 @@
 #define YOUREVENTLABEL_H
 
 #include "eventlabel.h"
-
+#include "mainwindow.h"
+#include "opennew.h"
+#include <QMenu>
+#include <QAction>
+#include <QPoint>
 class YourEventLabel : public EventLabel
 {
     Q_OBJECT

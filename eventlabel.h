@@ -1,16 +1,13 @@
 #ifndef EVENTLABEL_H
 #define EVENTLABEL_H
 
-#include "mainwindow.h"
-#include "opennew.h"
 #include <QObject>
 #include <QWidget>
 #include <QLabel>
 #include <QMouseEvent>
 #include <QFocusEvent>
-#include <QMenu>
-#include <QAction>
-#include <QPoint>
+#include <event.h>
+
 
 class EventLabel : public QLabel
 {
@@ -21,8 +18,8 @@ public:
     Event* currEvent;
 
 protected:
-    virtual void mousePressEvent(QMouseEvent *event);
-    virtual void mouseDoubleClickEvent(QMouseEvent *event);
+    virtual void mousePressEvent(QMouseEvent *event) = 0;
+    virtual void mouseDoubleClickEvent(QMouseEvent *event) = 0;
 };
 
 #endif // EVENTLABEL_H
