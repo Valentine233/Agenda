@@ -20,7 +20,8 @@ SOURCES += main.cpp\
     db.cpp \
     eventlabel.cpp \
     myeventlabel.cpp \
-    youreventlabel.cpp
+    youreventlabel.cpp \
+    tcpsender.cpp
 
 HEADERS  += mainwindow.h \
     opennew.h \
@@ -28,8 +29,11 @@ HEADERS  += mainwindow.h \
     db.h \
     eventlabel.h \
     myeventlabel.h \
-    youreventlabel.h
+    youreventlabel.h \
+    tcpsender.h
 
 FORMS    += mainwindow.ui
 
 QT += sql
+
+QT += network

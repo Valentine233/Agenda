@@ -22,6 +22,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(this, SIGNAL(openNewSignal(QMouseEvent*)), this, SLOT(openSpecialNew(QMouseEvent*)));
     writeToFile();
     readFromFile();
+    //QTextCodec::setCodecForTr(QTextCodec::codecForName("UTF-8"));
 }
 
 MainWindow::~MainWindow()

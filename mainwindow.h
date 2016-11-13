@@ -29,6 +29,8 @@
 #include "db.h"
 #include "opennew.h"
 #include "event.h"
+#include <QTextCodec>
+
 namespace Ui {
 class MainWindow;
 }
