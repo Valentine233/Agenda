@@ -20,7 +20,7 @@ MainWindow::MainWindow(QWidget *parent) :
     refreshAgenda(offset);
     // trans: an new special event is created
     QObject::connect(this, SIGNAL(openNewSignal(QMouseEvent*)), this, SLOT(openSpecialNew(QMouseEvent*)));
-    //writeToFile();
+    writeToFile();
     readFromFile();
 }
 
@@ -336,7 +336,7 @@ void MainWindow::eventsLoseFocus()
 {
     for(int k = 0; k < list->size(); k++)
     {
-        if (list->at(k)->eventUI != NULL) {
+        if (list->at(k)->eventUI != NULL && list->at(k)->eventType == 0) {
             list->at(k)->eventUI->setStyleSheet("background-color: rgba(34, 24, 245, 50);text-align: center; ");
         }
     }
@@ -381,7 +381,7 @@ void MainWindow::readFromFile() //接收对方文件时
 {
     //未实现替换现有YourEventList文件！
     db->deleteAllYourEvent();
-    if(!YourEventList.open(QIODevice::ReadOnly | QIODevice::Text))
+    if(!YourEventList.open(QIODevice::ReadWrite | QIODevice::Text))
     {
          qDebug()<<"ReadError: Can't open the file!\n";
          return;

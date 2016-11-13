@@ -3,7 +3,7 @@
 YourEventLabel::YourEventLabel(QWidget* parent, Event* _event) : EventLabel(parent)
 {
     currEvent = _event;
-    this->setStyleSheet("background-color: rgba(235, 34, 145, 50);text-align: center; ");
+    this->setStyleSheet("background-color: rgba(240, 54, 60, 50);text-align: center; ");
     QFont font = this->font();
     font.setPointSize(10);
     this->setFont(font);

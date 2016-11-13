@@ -44,12 +44,9 @@ public:
     static QDateTime curr_time;
     void refreshAgenda(int offset);
     void setinit();
-    QFile MyEventList;
-    QFile YourEventList;
     QTextStream MyEvent;
     QTextStream YourEvent;
-    static QList<Event*>* list;
-    //static QList<Event*>* yourlist;
+    QList<Event*>* list;
     void turnToEventTime(Event *);
     void removeEventUI();
     QLabel* tempUI = NULL;
