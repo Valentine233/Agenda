@@ -20,7 +20,8 @@ MainWindow::MainWindow(QWidget *parent) :
     refreshAgenda(offset);
     // trans: an new special event is created
     QObject::connect(this, SIGNAL(openNewSignal(QMouseEvent*)), this, SLOT(openSpecialNew(QMouseEvent*)));
-
+    //writeToFile();
+    readFromFile();
 }
 
 MainWindow::~MainWindow()
@@ -31,7 +32,7 @@ MainWindow::~MainWindow()
 void MainWindow::setinit()
 {
     // create a new general event
-    QPushButton *create = new QPushButton ( "&Create", this);
+    QPushButton *create = new QPushButton ( "新事件", this);
     create->setGeometry(800,100,100,40);
     connect(create, SIGNAL(clicked(bool)), this, SLOT(openGeneralNew()));
 
@@ -44,7 +45,7 @@ void MainWindow::setinit()
     backwards_button->setGeometry(30,60,20,20);
     connect(backwards_button, SIGNAL(clicked(bool)), this, SLOT(backwards()));
     // back to the current week
-    QPushButton *current = new QPushButton ( "&Today", this);
+    QPushButton *current = new QPushButton ( "今天", this);
     current->setGeometry(QRect(80,25,65,30));
     connect(current, SIGNAL(clicked(bool)), this, SLOT(currentTime()));
 
@@ -72,8 +73,8 @@ void MainWindow::setinit()
     }
 
     // Initialize the event list, by reading from db
-    mylist = new QList<Event*>();
-    yourlist = new QList<Event*>();
+    list = new QList<Event*>();
+    //yourlist = new QList<Event*>();
 
     // Read settings
     Event::defaultDuration = 60;
@@ -123,7 +124,6 @@ QLabel* MainWindow::addEventUI(Event *event)
 {
     QString weekStrings[7] = {"周一","周二","周三","周四","周五","周六","周日"};
     QString weekStart = event->eventStart.toString("ddd");
-    EventLabel* eventRect = new EventLabel(this, event);
     int startminute = 60*event->eventStart.toString("HH").toInt() + event->eventStart.toString("mm").toInt();
     int endminute = 60*event->eventEnd.toString("HH").toInt() + event->eventEnd.toString("mm").toInt();
 
@@ -131,27 +131,33 @@ QLabel* MainWindow::addEventUI(Event *event)
     {
         if(weekStart == weekStrings[j])
         {
-            eventRect->setGeometry(50+100*j,100+480*startminute/(24*60),50+event->eventType*50,480*(endminute-startminute)/(24*60));
-            eventRect->setStyleSheet("background-color: rgba(34, 24, 245, 50);text-align: center; ");
-            eventRect->setText(event->eventName+"\n"+event->eventPlace);
-            QFont font = eventRect->font();
-            font.setPointSize(10);
-            eventRect->setFont(font);
-            eventRect->setAlignment(Qt::AlignCenter);
-            eventRect->show();
-            event->eventUI = eventRect;
+            if(event->eventType == 0)
+            {
+                MyEventLabel* eventRect = new MyEventLabel(this, event);
+                eventRect->setGeometry(50+100*j,100+480*startminute/(24*60),50,480*(endminute-startminute)/(24*60));
+                eventRect->setText(event->eventName+"\n"+event->eventPlace);
+                event->eventUI = eventRect;
+                return eventRect;
+            }
+            else if(event->eventType == 1)
+            {
+                YourEventLabel* eventRect = new YourEventLabel(this, event);
+                eventRect->setGeometry(100+100*j,100+480*startminute/(24*60),50,480*(endminute-startminute)/(24*60));
+                eventRect->setText(event->eventName+"\n"+event->eventPlace);
+                event->eventUI = eventRect;
+                return eventRect;
+            }
         }
     }
-    return eventRect;
 }
 
 void MainWindow::removeEventUI()
 {
-    for(int k = 0; k < mylist->size(); k++)
+    for(int k = 0; k < list->size(); k++)
     {
-        if (mylist->at(k)->eventUI != NULL) {
-            delete mylist->at(k)->eventUI;
-            mylist->at(k)->eventUI = NULL;
+        if (list->at(k)->eventUI != NULL) {
+            delete list->at(k)->eventUI;
+            list->at(k)->eventUI = NULL;
         }
     }
 }
@@ -165,13 +171,13 @@ void MainWindow::refreshAgenda(int _offset)
     // QString weekStrings[7] = {"Mon","Tue","Wed","Thu","Fri","Sat","Sun"};
     QString weekStrings[7] = {"周一","周二","周三","周四","周五","周六","周日"};
     //add EventUI
-    for(int k = 0; k < mylist->size(); k++)
+    for(int k = 0; k < list->size(); k++)
     {
         QDate curr_date = QDate::currentDate();
-        int offset_k = (curr_date.addDays(-1*curr_date.dayOfWeek()).daysTo(mylist->at(k)->eventStart.date().addDays(-1 * mylist->at(k)->eventStart.date().dayOfWeek()))) / 7;
+        int offset_k = (curr_date.addDays(-1*curr_date.dayOfWeek()).daysTo(list->at(k)->eventStart.date().addDays(-1 * list->at(k)->eventStart.date().dayOfWeek()))) / 7;
         if (offset == offset_k) {
              //event is in this week
-            addEventUI(mylist->at(k));
+            addEventUI(list->at(k));
         }
     }
 
@@ -261,23 +267,22 @@ void MainWindow::turnToEventTime(Event *event)
 void MainWindow::createNewEvent(QString name, QString place, QDateTime starttime, QDateTime endtime, int type)
 {
     Event *event = new Event(name,place,starttime,endtime,type,this);
-    mylist->append(event);
+    list->append(event);
     db->addEvent(name,place,starttime,endtime,type);
-    //writeToFile(MyEventList);
     turnToEventTime(event);
 }
 
 void MainWindow::editEvent(QString name, QString place, QDateTime starttime, QDateTime endtime, int type, QString nameOld, QString placeOld, QDateTime startOld, QDateTime endOld)
 {
-    for(int k = 0; k < mylist->size(); k++)
+    for(int k = 0; k < list->size(); k++)
     {
-        if (mylist->at(k)->eventName == nameOld && mylist->at(k)->eventPlace == placeOld && mylist->at(k)->eventStart == startOld
-                && mylist->at(k)->eventEnd == endOld && mylist->at(k)->eventType == type)
+        if (list->at(k)->eventName == nameOld && list->at(k)->eventPlace == placeOld && list->at(k)->eventStart == startOld
+                && list->at(k)->eventEnd == endOld && list->at(k)->eventType == 0)
         {
-            mylist->at(k)->eventName = name;
-            mylist->at(k)->eventPlace = place;
-            mylist->at(k)->eventStart = starttime;
-            mylist->at(k)->eventEnd = endtime;
+            list->at(k)->eventName = name;
+            list->at(k)->eventPlace = place;
+            list->at(k)->eventStart = starttime;
+            list->at(k)->eventEnd = endtime;
             refreshAgenda(offset);
 
             //从数据库里更新
@@ -288,13 +293,13 @@ void MainWindow::editEvent(QString name, QString place, QDateTime starttime, QDa
 
 void MainWindow::deleteEvent(QString name, QString place, QDateTime starttime, QDateTime endtime, int type)
 {
-    for(int k = 0; k < mylist->size(); k++)
+    for(int k = 0; k < list->size(); k++)
     {
-        if (mylist->at(k)->eventName == name && mylist->at(k)->eventPlace == place && mylist->at(k)->eventStart == starttime
-                && mylist->at(k)->eventEnd == endtime && mylist->at(k)->eventType == type)
+        if (list->at(k)->eventName == name && list->at(k)->eventPlace == place && list->at(k)->eventStart == starttime
+                && list->at(k)->eventEnd == endtime && list->at(k)->eventType == type)
         {
-            Event* _event = mylist->at(k);
-            mylist->removeAt(k);
+            Event* _event = list->at(k);
+            list->removeAt(k);
             delete _event->eventUI;
             delete _event;
             refreshAgenda(offset);
@@ -305,7 +310,8 @@ void MainWindow::deleteEvent(QString name, QString place, QDateTime starttime, Q
     }
 }
 
-void MainWindow::loadFromDB() {
+void MainWindow::loadFromDB()
+{
 
     QSqlQuery query = db->readEvent();
     QSqlRecord record = query.record();
@@ -322,41 +328,109 @@ void MainWindow::loadFromDB() {
        QDateTime endtime = QDateTime::fromString(query.value(idEnd).toString());
        int type = query.value(idType).toString().toInt();
        Event *event = new Event(name,place,starttime,endtime,type,this);
-       mylist->append(event);
+       list->append(event);
     }
 }
 
-void MainWindow::eventsLoseFocus() {
-    for(int k = 0; k < mylist->size(); k++)
+void MainWindow::eventsLoseFocus()
+{
+    for(int k = 0; k < list->size(); k++)
     {
-        if (mylist->at(k)->eventUI != NULL) {
-            mylist->at(k)->eventUI->setStyleSheet("background-color: rgba(34, 24, 245, 50);text-align: center; ");
+        if (list->at(k)->eventUI != NULL) {
+            list->at(k)->eventUI->setStyleSheet("background-color: rgba(34, 24, 245, 50);text-align: center; ");
         }
     }
 }
 
-void MainWindow::mousePressEvent(QMouseEvent *event) {
+void MainWindow::mousePressEvent(QMouseEvent *event)
+{
     eventsLoseFocus();
     event->accept();
 }
 
-//void writeToFile(QFile MyEventList)
-//{
-//    if (!MyEventList.open(QIODevice::WriteOnly | QIODevice::Text))
-//       return;
-//    QTextStream out(&MyEventList);
-//    out << "The magic number is: " << 49 << "\n";
-//}
+void MainWindow::writeToFile() //传出我的文件时
+{
+    //未实现抹去MyEventList文件内容！
+    if (!MyEventList.open(QIODevice::WriteOnly | QIODevice::Text))
+    {
+        qDebug()<<"WriteError: Can't open the file!\n";
+        return;
+    }
+    QTextStream out(&MyEventList);
+    QSqlQuery query =  db->readAllMyEvent();
+    QSqlRecord record = query.record();
+    int idName = record.indexOf("name");
+    int idPlace = record.indexOf("place");
+    int idStart = record.indexOf("starttime");
+    int idEnd = record.indexOf("endtime");
+    int idType = record.indexOf("type");
+    while (query.next())
+    {
+       QString name = query.value(idName).toString();
+       QString place = query.value(idPlace).toString();
+       QDateTime starttime = QDateTime::fromString(query.value(idStart).toString());
+       QDateTime endtime = QDateTime::fromString(query.value(idEnd).toString());
+       int type = query.value(idType).toString().toInt();
+       QString start = starttime.toString("yyyy/MM/dd HH:mm");
+       QString end = endtime.toString("yyyy/MM/dd HH:mm");
+       out<<name<<",;"<<place<<",;"<<start<<",;"<<end<<",;"<<type<<"\n";
+    }
+}
 
-//void readFromFile(QFile YourEventList)
-//{
-//    if(!YourEventList.open(QIODevice::ReadOnly | QIODevice::Text))
-//    {
-//         qDebug()<<"Can't open the file!\n";
-//    }
-//    while(!YourEventList.atEnd()) {
-//        QByteArray line = file.readLine();
-//        QString str(line);
-//        qDebug()<< str;
-//    }
-//}
+void MainWindow::readFromFile() //接收对方文件时
+{
+    //未实现替换现有YourEventList文件！
+    db->deleteAllYourEvent();
+    if(!YourEventList.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+         qDebug()<<"ReadError: Can't open the file!\n";
+         return;
+    }
+    while(!YourEventList.atEnd()) {
+        QByteArray line = YourEventList.readLine();
+        QString str(line);
+        int i=0;
+        int flag=0;
+        QString Name, Place, Start, End, Type;
+        while(str[i]!='\x0')
+        {
+            while(str[i]!=',' || str[i+1]!=';')
+            {
+                switch (flag) {
+                case 0: //0:eventName
+                    Name += str[i];
+                    break;
+                case 1: //1:eventPlace
+                    Place += str[i];
+                    break;
+                case 2: //2:eventStart
+                    Start += str[i];
+                    break;
+                case 3: //3:eventEnd
+                    End += str[i];
+                    break;
+                case 4: //4:eventType
+                    Type += str[i];
+                    break;
+                default:
+                    break;
+                }
+                if(str[i+1] == '\x0' || str[i+1] == '\n')
+                    break;
+                i++;
+            }
+            if(flag!=4)
+                i++;
+            flag++;
+            i++;
+        }
+        QDateTime starttime = QDateTime::fromString(Start, "yyyy/MM/dd HH:mm");
+        QDateTime endtime = QDateTime::fromString(End, "yyyy/MM/dd HH:mm");
+        if(Type != "0") //对于对方来说是0事件
+        {
+            qDebug() << "type=" <<Type << "error";
+        }
+        int type = 1; //储存为1事件
+        createNewEvent(Name, Place, starttime, endtime, type);
+    }
+}

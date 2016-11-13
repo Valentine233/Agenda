@@ -17,7 +17,9 @@ public:
     void addEvent(QString name, QString place, QDateTime startTime, QDateTime endTime, int type);
     void dropDB();
     QSqlQuery readEvent();
+    QSqlQuery readAllMyEvent();
     void deleteEvent(QString name, QString place, QDateTime startTime, QDateTime endTime, int type);
+    void deleteAllYourEvent();
     void updateEvent(QString name, QString place, QDateTime startTime, QDateTime endTime, int type, QString nameOld, QString placeOld, QDateTime startOld, QDateTime endOld);
 };
 

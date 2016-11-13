@@ -38,13 +38,22 @@ void DB::addEvent(QString name, QString place, QDateTime startTime, QDateTime en
     }
 }
 
-QSqlQuery DB::readEvent() {
+QSqlQuery DB::readEvent()
+{
     query = QSqlQuery(db);
     query.exec("SELECT * FROM event;");
     return query;
 }
 
-void DB::deleteEvent(QString name, QString place, QDateTime startTime, QDateTime endTime, int type) {
+QSqlQuery DB::readAllMyEvent()
+{
+    query = QSqlQuery(db);
+    query.exec("SELECT * FROM event WHERE type = 0");
+    return query;
+}
+
+void DB::deleteEvent(QString name, QString place, QDateTime startTime, QDateTime endTime, int type)
+{
     query = QSqlQuery(db);
     query.prepare("DELETE FROM event WHERE name = :name AND place = :place AND starttime = :start AND endtime = :end AND type = :type;");
     query.bindValue(":name", name);
@@ -54,7 +63,18 @@ void DB::deleteEvent(QString name, QString place, QDateTime startTime, QDateTime
     query.bindValue(":type", type);
     if(!query.exec())
     {
-        qDebug() << "deleteError\n";
+        qDebug()<<query.lastError();
+    }
+}
+
+void DB::deleteAllYourEvent()
+{
+    query = QSqlQuery(db);
+    query.prepare("DELETE FROM event WHERE type = :type;");
+    query.bindValue(":type", 1);
+    if(!query.exec())
+    {
+        qDebug() << "deleteAllYourEvent Error\n";
         qDebug()<<query.lastError();
     }
 }

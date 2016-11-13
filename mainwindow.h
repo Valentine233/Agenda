@@ -1,6 +1,9 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include "myeventlabel.h"
+#include "youreventlabel.h"
+#include "db.h"
 #include "event.h"
 #include "opennew.h"
 #include "ui_mainwindow.h"
@@ -24,8 +27,8 @@
 #include <QList>
 #include <QSqlQuery>
 #include <QSqlRecord>
-#include <db.h>
-#include <eventlabel.h>
+#include <QFile>
+
 namespace Ui {
 class MainWindow;
 }
@@ -41,10 +44,12 @@ public:
     static QDateTime curr_time;
     void refreshAgenda(int offset);
     void setinit();
+    QFile MyEventList;
+    QFile YourEventList;
     QTextStream MyEvent;
     QTextStream YourEvent;
-    static QList<Event*>* mylist;
-    static QList<Event*>* yourlist;
+    static QList<Event*>* list;
+    //static QList<Event*>* yourlist;
     void turnToEventTime(Event *);
     void removeEventUI();
     QLabel* tempUI = NULL;
@@ -56,7 +61,6 @@ public:
     const static int bottomY = topY + 12 * gridHight;
     DB* db;
     void eventsLoseFocus();
-
 
 signals:
     void openNewSignal(QMouseEvent *);
@@ -72,6 +76,8 @@ public slots:
     void deleteEvent(QString, QString, QDateTime, QDateTime, int);
     QLabel* addEventUI(Event *);
     void loadFromDB();
+    void writeToFile();
+    void readFromFile();
 
 
 private:

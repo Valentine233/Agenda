@@ -1,8 +1,8 @@
 #include "opennew.h"
 
 QDateTime MainWindow::curr_time;
-QList<Event*>* MainWindow::mylist;
-QList<Event*>* MainWindow::yourlist;
+QList<Event*>* MainWindow::list;
+//QList<Event*>* MainWindow::yourlist;
 void AddEvent(QString, QString, QString, QString);
 
 OpenNew::OpenNew(QWidget* parent):QDialog(parent)
@@ -64,8 +64,6 @@ void OpenNew::setInit(int x, int y)
     timechoise->button(1)->click();
 
     //单次日期
-//    dateEdit->setMinimumDate(QDate::currentDate().addDays(-365));
-//    dateEdit->setMaximumDate(QDate::currentDate().addDays(365));
     dateEdit->setDate(eventDay);
     dateEdit->setDisplayFormat("yyyy/MM/dd");
     dateEdit->setGeometry(20,105,150,25);

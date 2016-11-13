@@ -20,16 +20,9 @@ public:
     EventLabel(QWidget* parent=Q_NULLPTR, Event* event = Q_NULLPTR);
     Event* currEvent;
 
-public slots:
-    void modify(QMouseEvent *event);
-
-signals:
-    void modifySignal(QMouseEvent *event);
-    void deleteConfirmSign(QString name, QString place, QDateTime startTime, QDateTime endTime, int type);
-
 protected:
-    void mousePressEvent(QMouseEvent *event);
-    void mouseDoubleClickEvent(QMouseEvent *event);
+    virtual void mousePressEvent(QMouseEvent *event);
+    virtual void mouseDoubleClickEvent(QMouseEvent *event);
 };
 
 #endif // EVENTLABEL_H
