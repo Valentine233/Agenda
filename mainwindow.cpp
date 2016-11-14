@@ -3,7 +3,7 @@
 
 QString myColorDefault = "MyEventLabel {background-color: #add2ff}";
 QString myColorFocus = "MyEventLabel {background-color: #6caeff}";
-
+QDateTime MainWindow::curr_time;
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
