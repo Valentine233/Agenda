@@ -23,7 +23,7 @@ private slots:
     void requestDialog();  //是否接受连接询问对话框
     void send();  //连接服务器
     void startTransfer();  //发送文件大小等信息
-    void updateServerProgress(qint64); //更新服务器进度
+    void updateServerProgress(); //更新服务器进度
     void updateClientProgress(qint64); //更新客户端进度
     void acceptConnection();  //建立连接
     void displayError(QAbstractSocket::SocketError); //显示错误

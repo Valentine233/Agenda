@@ -74,16 +74,14 @@ void Tcp::receiverSetinit()
     confirmBt->setText("确认");
     confirmBt->setGeometry(90,200,30,40);
     confirmBt->setEnabled(false);
-    connect(confirmBt,SIGNAL(clicked(bool)),this,SLOT(close());
+    connect(confirmBt,SIGNAL(clicked(bool)),this,SLOT(close()));
 }
 
 void Tcp::send()   //连接到服务器，执行发送
 {
     syncBt->setEnabled(false);
-    //初始化已发送字节为0
-    bytesWritten = 0;
     status->setText(tr("连接中..."));
-    tcpClient->connectToHost(hostEdit->text(),portEdit->text().toInt());//连接
+    tcpSocket->connectToHost(hostEdit->text(),portEdit->text().toInt());//连接
 }
 
 void Tcp::startTransfer()  //实现文件大小等信息的发送
@@ -112,7 +110,7 @@ void Tcp::startTransfer()  //实现文件大小等信息的发送
     sendOut<<sdTotalBytes<<qint64((outBlock.size() - sizeof(qint64)*2));
 
     //发送完头数据后剩余数据的大小
-    sdBytesToWrite = sdTotalBytes - tcpServer->write(outBlock);
+    sdBytesToWrite = sdTotalBytes - tcpSocket->write(outBlock);
 
     status->setText(tr("已连接"));
     outBlock.resize(0);
@@ -200,14 +198,14 @@ void Tcp::updateServerProgress()  //接收数据
        //tcpServerConnection->close();
        rcFile->close();
        confirmBt->setEnabled(true);
-       status->setText(tr("接收文件 %1 成功！").arg(fileName));
+       status->setText(tr("接收文件 %1 成功！").arg(rcFileName));
    }
 }
 
 void Tcp::displayError(QAbstractSocket::SocketError) //显示错误
 {
-    qDebug() << tcpServer->errorString();
-    tcpServer->close();
+    qDebug() << tcpSocket->errorString();
+    tcpSocket->close();
     status->setText(tr("就绪"));
     confirmBt->setEnabled(true);
 }
