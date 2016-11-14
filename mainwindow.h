@@ -1,6 +1,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include "tcp.h"
 #include "ui_mainwindow.h"
 #include <QMainWindow>
 #include <QWidget>
@@ -23,7 +24,6 @@
 #include <QSqlQuery>
 #include <QSqlRecord>
 #include <QFile>
-//#include "eventlabel.h"
 #include "myeventlabel.h"
 #include "youreventlabel.h"
 #include "db.h"
@@ -59,8 +59,15 @@ public:
     const static int rightX = leftX + 14 * gridWidth;
     const static int bottomY = topY + 12 * gridHight;
     DB* db;
+    QFile MyEventList;
+    QFile YourEventList;
+    Tcp *tcp;
     void eventsLoseFocus();
     QLabel* detailLabel;
+    QString myColorDefault = "MyEventLabel {background-color: rgba(173,210,255,0.8); color: #333333}";
+    QString myColorFocus = "MyEventLabel {background-color: rgba(108,174,255,0.8); color:white}";
+    QString yourColorDefault = "YourEventLabel {background-color: rgba(173,210,255,0.8); color: #333333}";
+    QString yourColorFocus = "YourEventLabel {background-color: rgba(108,174,255,0.8); color:white}";
 
 signals:
     void openNewSignal(QMouseEvent *);
@@ -78,7 +85,8 @@ public slots:
     void loadFromDB();
     void writeToFile();
     void readFromFile();
-
+    void showDetail(Event*);
+    void updatedata();
 
 private:
     Ui::MainWindow *ui;

@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/icon">
+        <file alias="back">go-back-left-arrow.png</file>
+        <file alias="forward">right-arrow-forward.png</file>
+    </qresource>
+</RCC>

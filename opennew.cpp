@@ -1,6 +1,5 @@
 #include "opennew.h"
 
-QDateTime MainWindow::curr_time;
 //QList<Event*>* MainWindow::list;
 //QList<Event*>* MainWindow::yourlist;
 void AddEvent(QString, QString, QString, QString);

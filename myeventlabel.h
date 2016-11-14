@@ -21,6 +21,8 @@ public slots:
 signals:
     void modifySignal(QMouseEvent *event);
     void deleteConfirmSign(QString name, QString place, QDateTime startTime, QDateTime endTime, int type);
+    void showDetailSignal(Event*);
+
 
 protected:
     void mousePressEvent(QMouseEvent *event);
