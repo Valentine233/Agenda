@@ -15,6 +15,7 @@ MainWindow::MainWindow(QWidget *parent) :
     MyEventList.setFileName("/Users/liaoxuan/QtProjet/Agenda/MyEventList.txt");
     YourEventList.setFileName("/Users/liaoxuan/QtProjet/Agenda/YourEventList.txt");
     tcp = new Tcp(this, &MyEventList, &YourEventList);
+    tcp->setGeometry(800,topY+130,150,300);
     db = new DB();
     loadFromDB();
 //    db->dropDB();

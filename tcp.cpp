@@ -51,7 +51,6 @@ void Tcp::requestDialog()
 
 void Tcp::senderSetinit()
 {
-    this->setGeometry(MainWindow::leftX+405,MainWindow::topY+130,150,300);
     QLabel *host = new QLabel(this);
     QLabel *port = new QLabel(this);
     host->setText("主机");
