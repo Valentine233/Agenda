@@ -18,8 +18,8 @@ MainWindow::MainWindow(QWidget *parent) :
     tcp->setGeometry(MainWindow::leftX+750,MainWindow::topY+280,220,220);
     tcp->hide();
     db = new DB();
-    loadFromDB();
 //    db->dropDB();
+    loadFromDB();
     offset = 0;
     refreshAgenda(offset);
     // trans: an new special event is created
@@ -306,6 +306,34 @@ void MainWindow::createNewEvent(QString name, QString place, QDateTime starttime
     list->append(event);
     db->addEvent(name,place,starttime,endtime,type);
     turnToEventTime(event);
+}
+
+void MainWindow::createNewEventPl(QString name,QString place,QDate startdate,
+                                  QDate enddate,QTime starttime,QTime endtime,int* checkedid,int type)
+{
+    int i;
+    QString weekStrings[7] = {"周一","周二","周三","周四","周五","周六","周日"};
+    QDate curr_date;
+    Event *lastEvent;
+    for(curr_date=startdate; curr_date<=enddate; curr_date=curr_date.addDays(1))
+    {
+        for(i=0; i<7; i++)
+        {
+            if(curr_date.toString("ddd") == weekStrings[i])
+            {
+                if(checkedid[i] == 1)
+                {
+                    QDateTime start(curr_date, starttime);
+                    QDateTime end(curr_date, endtime);
+                    Event *event = new Event(name,place,start,end,type,this);
+                    lastEvent = event;
+                    list->append(event);
+                    db->addEvent(name,place,start,end,type);
+                }
+            }
+        }
+    }
+    turnToEventTime(lastEvent);
 }
 
 void MainWindow::editEvent(QString name, QString place, QDateTime starttime, QDateTime endtime, int type, QString nameOld, QString placeOld, QDateTime startOld, QDateTime endOld)

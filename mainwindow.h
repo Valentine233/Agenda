@@ -79,6 +79,7 @@ public slots:
     void openSpecialNew(QMouseEvent *);
     void openGeneralNew();
     void createNewEvent(QString, QString, QDateTime, QDateTime, int);
+    void createNewEventPl(QString,QString,QDate,QDate,QTime,QTime,int*,int);
     void editEvent(QString, QString, QDateTime, QDateTime, int, QString, QString, QDateTime, QDateTime);
     void deleteEvent(QString, QString, QDateTime, QDateTime, int);
     EventLabel* addEventUI(Event *);

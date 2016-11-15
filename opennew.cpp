@@ -73,8 +73,7 @@ void OpenNew::setInit(int x, int y)
     start1->setGeometry(QRect(20,108,20,20));
     start1->hide();
 
-    startdate->setMinimumDate(QDate::currentDate());
-    startdate->setMaximumDate(QDate::currentDate().addDays(365));
+    startdate->setDate(eventDay);
     startdate->setDisplayFormat("yyyy/MM/dd");
     startdate->setGeometry(40,105,150,25);
     startdate->hide();
@@ -83,8 +82,7 @@ void OpenNew::setInit(int x, int y)
     end1->setGeometry(QRect(200,108,20,20));
     end1->hide();
 
-    enddate->setMinimumDate(QDate::currentDate());
-    enddate->setMaximumDate(QDate::currentDate().addDays(365));
+    enddate->setDate(eventDay);
     enddate->setDisplayFormat("yyyy/MM/dd");
     enddate->setGeometry(220,105,150,25);
     enddate->hide();
@@ -106,24 +104,27 @@ void OpenNew::setInit(int x, int y)
     endtime->setGeometry(220,140,150,25);
 
     //week选项
-    QButtonGroup *weekdays = new QButtonGroup;
+    weekdays->setExclusive(false);
     for(int i=0; i<7; i++)
     {
         QCheckBox* weekday = new QCheckBox(weekStrings[i], this);
         weekday->setGeometry(20+50*i,180,50,20);
-        weekdays->addButton(weekday);
-
+        weekday->hide();
+        weekdays->addButton(weekday,i);
     }
 
     addButton->setText("添加");
-    addButton->setGeometry(QRect(300,210,40,20));
+    addButton->setGeometry(QRect(300,190,40,20));
     addButton->setStyleSheet("QPushButton {color: black;}");
 
     QObject::connect(timechoise, SIGNAL(buttonPressed(int)), this, SLOT(TimeChoose(int)));
     QObject::connect(addButton, SIGNAL(clicked(bool)), this, SLOT(sendAdd()));
     QObject::connect(this, SIGNAL(transAdd(QString, QString, QDateTime, QDateTime, int)), this->parent(),
                      SLOT(createNewEvent(QString,QString,QDateTime, QDateTime, int)));
+    QObject::connect(this, SIGNAL(transAddPl(QString,QString,QDate,QDate,QTime,QTime,int*,int)), this->parent(),
+                     SLOT(createNewEventPl(QString,QString,QDate,QDate,QTime,QTime,int*,int)));
     QObject::connect(this, SIGNAL(transAdd(QString, QString, QDateTime, QDateTime, int)), this, SLOT(close()));
+    QObject::connect(this, SIGNAL(transAddPl(QString,QString,QDate,QDate,QTime,QTime,int*,int)), this, SLOT(close()));
 
     confirmButton->setText("确认");
     confirmButton->setGeometry(QRect(300,210,40,20));
@@ -159,14 +160,28 @@ void OpenNew::sendAdd() //myevent: type = 0,   yourevent: type = 1
     connect(this, SIGNAL(diffDaysSignal()), this, SLOT(diffDaysWarning()));
     QDateTime start(dateEdit->date(), starttime->dateTime().time());
     QDateTime end(dateEdit->date(), endtime->dateTime().time());
+    QDate sdate(startdate->date());
+    QDate edate(enddate->date());
+    QTime stime(starttime->dateTime().time());
+    QTime etime(endtime->dateTime().time());
+    int id[7] = {0};
+    for(int i=0; i<7; i++)
+    {
+        if(weekdays->button(i)->isChecked())
+            id[i] = 1;
+    }
     deleteTemp();
     if(start.time() > end.time())
     {
         emit diffDaysSignal();
     }
-    else
+    else if(startdate->isHidden() && enddate->isHidden())
     {
         emit transAdd(nameinput->text(), placeinput->text(), start, end, 0);
+    }
+    else
+    {
+        emit transAddPl(nameinput->text(), placeinput->text(), sdate, edate, stime, etime, id, 0);
     }
 }
 
@@ -204,6 +219,11 @@ void OpenNew::TimeChoose(int id)
 
     if(id==1) //单次事件
     {
+        for(int i=0; i<weekdays->buttons().length(); i++)
+        {
+            weekdays->button(i)->hide();
+        }
+        addButton->setGeometry(QRect(300,190,40,20));
         startdate->hide();
         enddate->hide();
         start1->hide();
@@ -215,6 +235,11 @@ void OpenNew::TimeChoose(int id)
     else if(id==2) //重复事件
     {
         dateEdit->hide();
+        for(int i=0; i<weekdays->buttons().length(); i++)
+        {
+            weekdays->button(i)->show();
+        }
+        addButton->setGeometry(QRect(300,210,40,20));
         startdate->show();
         enddate->show();
         start1->show();
