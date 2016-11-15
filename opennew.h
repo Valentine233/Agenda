@@ -28,9 +28,11 @@ public:
     QPushButton* addButton = new QPushButton(this);
     QPushButton* confirmButton = new QPushButton(this);
     QPushButton* deleteButton = new QPushButton(this);
+    QButtonGroup *weekdays = new QButtonGroup(this);
 
 signals:
     void transAdd(QString, QString, QDateTime, QDateTime, int);
+    void transAddPl(QString,QString,QDate,QDate,QTime,QTime,int*,int);
     void transEdit(QString, QString, QDateTime, QDateTime, int, QString, QString, QDateTime, QDateTime);
     void transDelete(QString, QString, QDateTime, QDateTime, int);
     void deleteConfirm(QString, QString, QDateTime, QDateTime, int);

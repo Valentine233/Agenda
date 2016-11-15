@@ -11,17 +11,17 @@
 #include <QMessageBox>
 #include <QFile>
 
-class Tcp : public QWidget
+class Tcp : public QDialog
 {
     Q_OBJECT
 public:
     Tcp(QWidget *parent, QFile *MyEventList, QFile *YourEventList);
     void senderSetinit();
-    void receiverSetinit();
 
 private slots:
     void requestDialog();  //是否接受连接询问对话框
     void send();  //连接服务器
+    void receiverSetinit();
     void startTransfer();  //发送文件大小等信息
     void updateServerProgress(); //更新服务器进度
     void updateClientProgress(qint64); //更新客户端进度

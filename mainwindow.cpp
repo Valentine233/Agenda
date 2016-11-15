@@ -15,10 +15,11 @@ MainWindow::MainWindow(QWidget *parent) :
     MyEventList.setFileName("/Users/liaoxuan/QtProjet/Agenda/MyEventList.txt");
     YourEventList.setFileName("/Users/liaoxuan/QtProjet/Agenda/YourEventList.txt");
     tcp = new Tcp(this, &MyEventList, &YourEventList);
-    tcp->setGeometry(800,topY+130,150,300);
+    tcp->setGeometry(MainWindow::leftX+750,MainWindow::topY+280,220,220);
+    tcp->hide();
     db = new DB();
-    loadFromDB();
 //    db->dropDB();
+    loadFromDB();
     offset = 0;
     refreshAgenda(offset);
     // trans: an new special event is created
@@ -93,7 +94,7 @@ void MainWindow::setinit()
     //yourlist = new QList<Event*>();
 
     detailLabel = new QLabel(this);
-    detailLabel->setGeometry(rightX+20,topY,100,300);
+    detailLabel->setGeometry(rightX+20,topY+50,200,300);
 
     // Read settings
     Event::defaultDuration = 60;
@@ -101,7 +102,7 @@ void MainWindow::setinit()
     // Update Date Button
     QPushButton *updateButton = new QPushButton(this);
     updateButton->setText("更新");
-    updateButton->setGeometry(QRect(800,200,100,40));
+    updateButton->setGeometry(QRect(800,150,100,40));
     QObject::connect(updateButton,SIGNAL(clicked(bool)),this,SLOT(updatedata()));
 }
 
@@ -307,6 +308,34 @@ void MainWindow::createNewEvent(QString name, QString place, QDateTime starttime
     turnToEventTime(event);
 }
 
+void MainWindow::createNewEventPl(QString name,QString place,QDate startdate,
+                                  QDate enddate,QTime starttime,QTime endtime,int* checkedid,int type)
+{
+    int i;
+    QString weekStrings[7] = {"周一","周二","周三","周四","周五","周六","周日"};
+    QDate curr_date;
+    Event *lastEvent;
+    for(curr_date=startdate; curr_date<=enddate; curr_date=curr_date.addDays(1))
+    {
+        for(i=0; i<7; i++)
+        {
+            if(curr_date.toString("ddd") == weekStrings[i])
+            {
+                if(checkedid[i] == 1)
+                {
+                    QDateTime start(curr_date, starttime);
+                    QDateTime end(curr_date, endtime);
+                    Event *event = new Event(name,place,start,end,type,this);
+                    lastEvent = event;
+                    list->append(event);
+                    db->addEvent(name,place,start,end,type);
+                }
+            }
+        }
+    }
+    turnToEventTime(lastEvent);
+}
+
 void MainWindow::editEvent(QString name, QString place, QDateTime starttime, QDateTime endtime, int type, QString nameOld, QString placeOld, QDateTime startOld, QDateTime endOld)
 {
     for(int k = 0; k < list->size(); k++)
@@ -374,7 +403,7 @@ void MainWindow::eventsLoseFocus()
              if(list->at(k)->eventType == 0)
                  list->at(k)->eventUI->setStyleSheet(myColorDefault);
              else if(list->at(k)->eventType == 1)
-                 list->at(k)->eventUI->setStyleSheet(myColorDefault);
+                 list->at(k)->eventUI->setStyleSheet(yourColorDefault);
 //             list->at(k)->eventUI->rightLabel = NULL;
              detailLabel->hide();
         }
@@ -475,11 +504,15 @@ void MainWindow::readFromFile() //接收对方文件时
 }
 
 void MainWindow::showDetail(Event* event) {
-    detailLabel->setText(event->eventName);
+    detailLabel->setText("事件名称："+event->eventName+"\n"+"事件地点："+event->eventPlace+"\n"+"事件日期："
+                         +event->eventStart.date().toString("yyyy/MM/dd")+"\n"
+                         +"开始时间："+event->eventStart.time().toString("HH:mm")+"\n"
+                         +"结束时间："+event->eventEnd.time().toString("HH:mm")+"\n");
     detailLabel->show();
 }
 
 void MainWindow::updatedata()
 {
+    tcp->show();
     tcp->senderSetinit();
 }

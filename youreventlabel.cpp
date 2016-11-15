@@ -9,10 +9,19 @@ YourEventLabel::YourEventLabel(QWidget* parent, Event* _event) : EventLabel(pare
     this->setFont(font);
     this->setAlignment(Qt::AlignCenter);
     this->show();
+    QObject::connect(this, SIGNAL(showDetailSignal(Event*)), (MainWindow*)this->parent(), SLOT(showDetail(Event*)));
 }
 
 //点击一次
 void YourEventLabel::mousePressEvent(QMouseEvent *event) {
+    //左键，显示高亮
+    if(event->button() == Qt::LeftButton)
+    {
+        ((MainWindow*)parent())->eventsLoseFocus();
+        this->setStyleSheet(((MainWindow*)this->parent())->yourColorFocus);
+        emit showDetailSignal(currEvent);
+        event->accept();
+    }
     // 无修改权限
 }
 

@@ -66,8 +66,8 @@ public:
     QLabel* detailLabel;
     QString myColorDefault = "MyEventLabel {background-color: rgba(173,210,255,0.8); color: #333333}";
     QString myColorFocus = "MyEventLabel {background-color: rgba(108,174,255,0.8); color:white}";
-    QString yourColorDefault = "YourEventLabel {background-color: rgba(173,210,255,0.8); color: #333333}";
-    QString yourColorFocus = "YourEventLabel {background-color: rgba(108,174,255,0.8); color:white}";
+    QString yourColorDefault = "YourEventLabel {background-color: rgba(240, 54, 60, 50); color: #333333}";
+    QString yourColorFocus = "YourEventLabel {background-color: rgba(240, 54, 60, 90); color:white}";
 
 signals:
     void openNewSignal(QMouseEvent *);
@@ -79,6 +79,7 @@ public slots:
     void openSpecialNew(QMouseEvent *);
     void openGeneralNew();
     void createNewEvent(QString, QString, QDateTime, QDateTime, int);
+    void createNewEventPl(QString,QString,QDate,QDate,QTime,QTime,int*,int);
     void editEvent(QString, QString, QDateTime, QDateTime, int, QString, QString, QDateTime, QDateTime);
     void deleteEvent(QString, QString, QDateTime, QDateTime, int);
     EventLabel* addEventUI(Event *);
