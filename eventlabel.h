@@ -16,6 +16,9 @@ public:
     EventLabel(QWidget* parent=Q_NULLPTR, Event* event = Q_NULLPTR);
     Event* currEvent;
 
+signals:
+    void showDetailSignal(Event*);
+
 protected:
     virtual void mousePressEvent(QMouseEvent *event) = 0;
     virtual void mouseDoubleClickEvent(QMouseEvent *event) = 0;

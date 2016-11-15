@@ -15,6 +15,8 @@ MainWindow::MainWindow(QWidget *parent) :
     MyEventList.setFileName("/Users/liaoxuan/QtProjet/Agenda/MyEventList.txt");
     YourEventList.setFileName("/Users/liaoxuan/QtProjet/Agenda/YourEventList.txt");
     tcp = new Tcp(this, &MyEventList, &YourEventList);
+    tcp->setGeometry(MainWindow::leftX+750,MainWindow::topY+280,220,220);
+    tcp->hide();
     db = new DB();
     loadFromDB();
 //    db->dropDB();
@@ -92,7 +94,7 @@ void MainWindow::setinit()
     //yourlist = new QList<Event*>();
 
     detailLabel = new QLabel(this);
-    detailLabel->setGeometry(rightX+20,topY,100,300);
+    detailLabel->setGeometry(rightX+20,topY+50,200,300);
 
     // Read settings
     Event::defaultDuration = 60;
@@ -100,7 +102,7 @@ void MainWindow::setinit()
     // Update Date Button
     QPushButton *updateButton = new QPushButton(this);
     updateButton->setText("更新");
-    updateButton->setGeometry(QRect(800,200,100,40));
+    updateButton->setGeometry(QRect(800,150,100,40));
     QObject::connect(updateButton,SIGNAL(clicked(bool)),this,SLOT(updatedata()));
 }
 
@@ -373,7 +375,7 @@ void MainWindow::eventsLoseFocus()
              if(list->at(k)->eventType == 0)
                  list->at(k)->eventUI->setStyleSheet(myColorDefault);
              else if(list->at(k)->eventType == 1)
-                 list->at(k)->eventUI->setStyleSheet(myColorDefault);
+                 list->at(k)->eventUI->setStyleSheet(yourColorDefault);
 //             list->at(k)->eventUI->rightLabel = NULL;
              detailLabel->hide();
         }
@@ -474,11 +476,15 @@ void MainWindow::readFromFile() //接收对方文件时
 }
 
 void MainWindow::showDetail(Event* event) {
-    detailLabel->setText(event->eventName);
+    detailLabel->setText("事件名称："+event->eventName+"\n"+"事件地点："+event->eventPlace+"\n"+"事件日期："
+                         +event->eventStart.date().toString("yyyy/MM/dd")+"\n"
+                         +"开始时间："+event->eventStart.time().toString("HH:mm")+"\n"
+                         +"结束时间："+event->eventEnd.time().toString("HH:mm")+"\n");
     detailLabel->show();
 }
 
 void MainWindow::updatedata()
 {
+    tcp->show();
     tcp->senderSetinit();
 }

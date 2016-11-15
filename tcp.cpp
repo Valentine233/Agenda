@@ -1,6 +1,6 @@
 #include "tcp.h"
 
-Tcp::Tcp(QWidget *parent, QFile *MyEventList, QFile *YourEventList) : QWidget(parent)
+Tcp::Tcp(QWidget *parent, QFile *MyEventList, QFile *YourEventList) : QDialog(parent)
 {
     sdFile = MyEventList;
     sdFileName = MyEventList->fileName();
@@ -24,8 +24,7 @@ Tcp::Tcp(QWidget *parent, QFile *MyEventList, QFile *YourEventList) : QWidget(pa
     connect(tcpSocket,SIGNAL(connected()), this, SLOT(acceptConnection()));
 
     //当有数据发送成功时，我们更新进度
-    connect(tcpSocket,SIGNAL(sdBytesWritten(qint64)),this,SLOT(updateClientProgress(qint64)));
-    //connect(tcpSocket,SIGNAL(sdBytesWritten(qint64)),this,SLOT(updateServerProgress(qint64)));
+    connect(tcpSocket,SIGNAL(bytesWritten(qint64)),this,SLOT(updateClientProgress(qint64)));
     connect(tcpSocket,SIGNAL(error(QAbstractSocket::SocketError)),this,SLOT(displayError(QAbstractSocket::SocketError)));
 
     //始终监听，监听地址为本机
@@ -41,6 +40,7 @@ void Tcp::requestDialog()
 {
     QMessageBox messageBox(this);
     messageBox.setText("收到同步事件请求，是否接受？");
+    QAbstractButton *rejectBt = messageBox.addButton(QMessageBox::No);
     QAbstractButton *acceptBt = messageBox.addButton(QMessageBox::Yes);
     messageBox.exec();
     //如果确认接收，开始连接
@@ -51,28 +51,38 @@ void Tcp::requestDialog()
 
 void Tcp::senderSetinit()
 {
-    this->setGeometry(MainWindow::leftX+405,MainWindow::topY+130,150,300);
+    sdFile->close();
+    rcFile->close();
     QLabel *host = new QLabel(this);
     QLabel *port = new QLabel(this);
-    host->setText("主机");
-    host->setGeometry(15,90,30,40);
-    port->setText("端口");
-    port->setGeometry(15,150,30,40);
-    hostEdit->setGeometry(55,90,90,40);
-    portEdit->setGeometry(55,150,90,40);
-    status->setText("请输入主机地址和端口号");
-    status->setGeometry(15,210,120,40);
+    host->setText("主机：");
+    host->setGeometry(30,30,30,40);
+    host->show();
+    port->setText("端口：");
+    port->setGeometry(30,70,30,40);
+    port->show();
+    confirmBt->hide();
+    hostEdit->setGeometry(70,40,120,20);
+    portEdit->setGeometry(70,80,120,20);
+    status->setText("请输入主机地址和端口号！");
+    status->setGeometry(30,110,160,40);
     syncBt->setText("同步");
-    syncBt->setGeometry(90,270,30,40);
+    syncBt->setStyleSheet("QPushButton {color: black;}");
+    syncBt->setGeometry(90,160,100,20);
     connect(syncBt,SIGNAL(clicked(bool)),this,SLOT(send()));
 }
 
 void Tcp::receiverSetinit()
 {
-    this->setGeometry(MainWindow::leftX+405,MainWindow::topY+130,150,300);
-    status->setGeometry(15,100,120,40);
+    sdFile->close();
+    rcFile->close();
+    hostEdit->hide();
+    portEdit->hide();
+    syncBt->hide();
+    status->setGeometry(30,70,160,40);
     confirmBt->setText("确认");
-    confirmBt->setGeometry(90,200,30,40);
+    confirmBt->setGeometry(90,160,100,20);
+    confirmBt->show();
     confirmBt->setEnabled(false);
     connect(confirmBt,SIGNAL(clicked(bool)),this,SLOT(close()));
 }
@@ -142,7 +152,7 @@ void Tcp::updateClientProgress(qint64 numBytes)
     {
        status->setText(tr("传送文件 %1 成功").arg(sdFileName));
        sdFile->close();
-       //tcpSocket->close();
+       tcpSocket->close();
     }
 }
 
@@ -153,7 +163,7 @@ void Tcp::acceptConnection()  //接受连接
     connect(tcpSocket,SIGNAL(error(QAbstractSocket::SocketError)),
             this,SLOT(displayError(QAbstractSocket::SocketError)));
     status->setText(tr("接受连接"));
-    //tcpServer.close();
+    tcpServer.close();
 }
 
 void Tcp::updateServerProgress()  //接收数据
@@ -195,7 +205,7 @@ void Tcp::updateServerProgress()  //接收数据
    if(rcBytesReceived == rcTotalBytes)
    {
        //接收数据完成时
-       //tcpServerConnection->close();
+       tcpSocket->close();
        rcFile->close();
        confirmBt->setEnabled(true);
        status->setText(tr("接收文件 %1 成功！").arg(rcFileName));
@@ -206,7 +216,8 @@ void Tcp::displayError(QAbstractSocket::SocketError) //显示错误
 {
     qDebug() << tcpSocket->errorString();
     tcpSocket->close();
-    status->setText(tr("就绪"));
+    status->setText(tr("发生错误。。请重新输入"));
     confirmBt->setEnabled(true);
+    syncBt->setEnabled(true);
 }
 
