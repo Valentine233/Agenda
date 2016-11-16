@@ -1,8 +1,7 @@
 #include "mainwindow.h"
 
-
-QString myColorDefault = "MyEventLabel {background-color: #add2ff}";
-QString myColorFocus = "MyEventLabel {background-color: #6caeff}";
+//QString myColorDefault = "MyEventLabel {background-color: #add2ff}";
+//QString myColorFocus = "MyEventLabel {background-color: #6caeff}";
 QDateTime MainWindow::curr_time;
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -12,10 +11,12 @@ MainWindow::MainWindow(QWidget *parent) :
     setinit();
     setWindowStyle();
     setWindowTitle(tr("Agenda"));
-    MyEventList.setFileName("/Users/wangyifan/QtProjects/Agenda/MyEventList.txt");
-    YourEventList.setFileName("/Users/wangyifan/QtProjects/Agenda/YourEventList.txt");
+    QString runPath = QCoreApplication::applicationDirPath();
+    MyEventList.setFileName(runPath+"/MyEventList.txt");
+    YourEventList.setFileName(runPath+"/YourEventList.txt");
     tcp = new Tcp(this, &MyEventList, &YourEventList);
     tcp->setGeometry(MainWindow::leftX+750,MainWindow::topY+280,220,220);
+    tcp->setFixedSize(220,220);
     tcp->hide();
     db = new DB();
 //    db->dropDB();
@@ -26,7 +27,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(this, SIGNAL(openNewSignal(QMouseEvent*)), this, SLOT(openSpecialNew(QMouseEvent*)));
     writeToFile();
     readFromFile();
-    //QTextCodec::setCodecForTr(QTextCodec::codecForName("UTF-8"));
+//    QTextCodec::setCodecForTr(QTextCodec::codecForName("UTF-8"));
 }
 
 MainWindow::~MainWindow()
@@ -289,6 +290,7 @@ void MainWindow::openGeneralNew()
 {
     OpenNew opennew(this);
     opennew.setGeometry(leftX+380,topY+160,400,240);
+    opennew.setFixedSize(400,240);
     opennew.setInit(-1,-1);
     opennew.exec();
 }

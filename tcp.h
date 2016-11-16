@@ -10,6 +10,7 @@
 #include <QProgressBar>
 #include <QMessageBox>
 #include <QFile>
+#include <QHostAddress>
 
 class Tcp : public QDialog
 {
@@ -29,6 +30,7 @@ private slots:
     void displayError(QAbstractSocket::SocketError); //显示错误
 
 private:
+    QHostAddress ipAdd;
     QLineEdit *hostEdit = new QLineEdit(this); //主机
     QLineEdit *portEdit = new QLineEdit(this); //端口
     QLabel *status = new QLabel(this); //状态栏
