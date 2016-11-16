@@ -30,6 +30,7 @@
 #include "opennew.h"
 #include "event.h"
 #include <QTextCodec>
+#include <QCoreApplication>
 class Tcp;
 namespace Ui {
 class MainWindow;

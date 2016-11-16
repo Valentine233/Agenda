@@ -18,6 +18,7 @@ Tcp::Tcp(QWidget *parent, QFile *MyEventList, QFile *YourEventList) : QDialog(pa
 
     //当发现新连接时发出newConnection()信号，弹出对话框
     connect(&tcpServer,SIGNAL(newConnection()),this,SLOT(requestDialog()));
+    //接收方同意的同时也要向对方发送文件
     connect(&tcpServer,SIGNAL(newConnection()),this,SLOT(startTransfer()));
     //当连接服务器成功时，发出connected()信号，我们开始传送文件
     connect(tcpSocket,SIGNAL(connected()),this,SLOT(startTransfer()));
@@ -27,13 +28,15 @@ Tcp::Tcp(QWidget *parent, QFile *MyEventList, QFile *YourEventList) : QDialog(pa
     connect(tcpSocket,SIGNAL(bytesWritten(qint64)),this,SLOT(updateClientProgress(qint64)));
     connect(tcpSocket,SIGNAL(error(QAbstractSocket::SocketError)),this,SLOT(displayError(QAbstractSocket::SocketError)));
 
-    //始终监听，监听地址为本机
-    if(!tcpServer.listen(QHostAddress::LocalHost,6666))
-    {
-       qDebug() << tcpServer.errorString();
-       close();
-       return;
-    }
+    //始终监听
+    tcpServer.listen(ipAdd,6666);
+//    if(tcpServer.listen(QHostAddress::LocalHost,6666))
+//    {
+//        status->setText("不能连接到本机");
+//        close();
+//        return;
+//    }
+
 }
 
 void Tcp::requestDialog()
@@ -99,6 +102,7 @@ void Tcp::startTransfer()  //实现文件大小等信息的发送
     if(!sdFile->open(QFile::ReadOnly))
     {
        qDebug() << "open file error!";
+       close();
        return;
     }
 
