@@ -1,7 +1,8 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include "tcp.h"
+#include "tcpclient.h"
+#include "tcpserver.h"
 #include "ui_mainwindow.h"
 #include <QMainWindow>
 #include <QWidget>
@@ -31,7 +32,8 @@
 #include "event.h"
 #include <QTextCodec>
 #include <QCoreApplication>
-class Tcp;
+class TcpClient;
+class TcpServer;
 namespace Ui {
 class MainWindow;
 }
@@ -62,7 +64,7 @@ public:
     DB* db;
     QFile MyEventList;
     QFile YourEventList;
-    Tcp *tcp;
+    TcpServer *tcpServer;
     void eventsLoseFocus();
     QLabel* detailLabel;
     QString myColorDefault = "MyEventLabel {background-color: rgba(173,210,255,0.8); color: #333333}";

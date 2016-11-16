@@ -14,10 +14,10 @@ MainWindow::MainWindow(QWidget *parent) :
     QString runPath = QCoreApplication::applicationDirPath();
     MyEventList.setFileName(runPath+"/MyEventList.txt");
     YourEventList.setFileName(runPath+"/YourEventList.txt");
-    tcp = new Tcp(this, &MyEventList, &YourEventList);
-    tcp->setGeometry(MainWindow::leftX+750,MainWindow::topY+280,220,220);
-    tcp->setFixedSize(220,220);
-    tcp->hide();
+    tcpServer = new TcpServer(this ,&MyEventList);
+    tcpServer->setGeometry(MainWindow::leftX+750,MainWindow::topY+280,220,220);
+    tcpServer->setFixedSize(220,220);
+    tcpServer->hide();
     db = new DB();
 //    db->dropDB();
     loadFromDB();
@@ -515,6 +515,8 @@ void MainWindow::showDetail(Event* event) {
 
 void MainWindow::updatedata()
 {
-    tcp->show();
-    tcp->senderSetinit();
+    TcpClient *tcpClient = new TcpClient(this, &YourEventList);
+    tcpClient->setGeometry(leftX+750,topY+280,220,220);
+    tcpClient->setFixedSize(220,220);
+    tcpClient->show();
 }

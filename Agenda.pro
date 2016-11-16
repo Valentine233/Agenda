@@ -21,7 +21,9 @@ SOURCES += main.cpp\
     eventlabel.cpp \
     myeventlabel.cpp \
     youreventlabel.cpp \
-    tcp.cpp
+    tcp.cpp \
+    tcpserver.cpp \
+    tcpclient.cpp
 
 HEADERS  += mainwindow.h \
     opennew.h \
@@ -30,7 +32,9 @@ HEADERS  += mainwindow.h \
     eventlabel.h \
     myeventlabel.h \
     youreventlabel.h \
-    tcp.h
+    tcp.h \
+    tcpserver.h \
+    tcpclient.h
 
 FORMS    += mainwindow.ui
 
