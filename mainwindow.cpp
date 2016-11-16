@@ -12,8 +12,8 @@ MainWindow::MainWindow(QWidget *parent) :
     setinit();
     setWindowStyle();
     setWindowTitle(tr("Agenda"));
-    MyEventList.setFileName("/Users/liaoxuan/QtProjet/Agenda/MyEventList.txt");
-    YourEventList.setFileName("/Users/liaoxuan/QtProjet/Agenda/YourEventList.txt");
+    MyEventList.setFileName("/Users/wangyifan/QtProjects/Agenda/MyEventList.txt");
+    YourEventList.setFileName("/Users/wangyifan/QtProjects/Agenda/YourEventList.txt");
     tcp = new Tcp(this, &MyEventList, &YourEventList);
     tcp->setGeometry(MainWindow::leftX+750,MainWindow::topY+280,220,220);
     tcp->hide();

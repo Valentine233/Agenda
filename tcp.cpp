@@ -98,7 +98,9 @@ void Tcp::startTransfer()  //实现文件大小等信息的发送
 {
     if(!sdFile->open(QFile::ReadOnly))
     {
-       qDebug() << "open file error!";
+       qDebug() << "Tcp::startTransfer():open file error!";
+       qDebug() <<sdFile->fileName();
+       qDebug() << sdFile->errorString();
        return;
     }
 
@@ -187,7 +189,7 @@ void Tcp::updateServerProgress()  //接收数据
            rcFile= new QFile(rcFileName);
            if(!rcFile->open(QFile::WriteOnly))
            {
-                qDebug() << "open file error!";
+                qDebug() << "Tcp::updateServerProgress():open file error!";
                 return;
            }
        }
