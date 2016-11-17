@@ -13,11 +13,11 @@ class TcpServer : public QDialog
     Q_OBJECT
 public:
     TcpServer(QWidget *parent, QFile *MyEventList);
-    void setinit();
     void startTransfer();
 
 private slots:
     //void start();   //开始监听
+    void setinit();
     void acceptConnection();  //建立连接
     void updateServerProgress(qint64 numBytes);  //发送数据
     void requestDialog();   //是否接受连接询问对话框

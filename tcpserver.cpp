@@ -8,12 +8,13 @@ TcpServer::TcpServer(QWidget *parent, QFile *MyEventList) : QDialog(parent)
 
     //当发现新连接时发出newConnection()信号，弹出对话框
     connect(&tcpServer,SIGNAL(newConnection()),this,SLOT(requestDialog()));
-    if(!tcpServer.listen(QHostAddress::LocalHost,6666))
-    {
-       qDebug() << tcpServer.errorString();
-       close();
-       return;
-    }
+    tcpServer.listen(QHostAddress::LocalHost,6666);
+//    if(!tcpServer.listen(QHostAddress::LocalHost,6666))
+//    {
+//       qDebug() << tcpServer.errorString();
+//       close();
+//       return;
+//    }
 }
 
 void TcpServer::requestDialog()
