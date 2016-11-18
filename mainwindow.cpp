@@ -96,7 +96,7 @@ void MainWindow::setinit()
     QObject::connect(editZoneBt, SIGNAL(clicked(bool)), this, SLOT(editTimeZone()));
     QLineEdit *lineEdit = new QLineEdit(this);
     lineEdit->setGeometry(QRect(590,20,150,30));
-    lineEdit->setPlaceholderText("请输入－14～14的整数");
+    lineEdit->setPlaceholderText("请输入-14～14的整数");
     lineEdit->hide();
     lineEditZone = lineEdit;
     QPushButton *confirmZone = new QPushButton(this);
