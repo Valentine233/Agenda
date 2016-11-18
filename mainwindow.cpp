@@ -14,16 +14,16 @@ MainWindow::MainWindow(QWidget *parent) :
     QString runPath = QCoreApplication::applicationDirPath();
     MyEventList.setFileName(runPath+"/MyEventList.txt");
     YourEventList.setFileName(runPath+"/YourEventList.txt");
-    tcp = new Tcp(this, &MyEventList, &YourEventList);
-    tcp->setGeometry(MainWindow::leftX+750,MainWindow::topY+280,220,220);
-    tcp->setFixedSize(220,220);
-    tcp->hide();
+    tcpServer = new TcpServer(this ,&MyEventList);
+    tcpServer->setGeometry(MainWindow::leftX+750,MainWindow::topY+280,220,220);
+    tcpServer->setFixedSize(220,220);
+    tcpServer->hide();
     db = new DB();
 //    db->dropDB();
     loadFromDB();
     offset = 0;
     refreshAgenda(offset);
-    // trans: an new special event is created
+    // trans: a new special event is created
     QObject::connect(this, SIGNAL(openNewSignal(QMouseEvent*)), this, SLOT(openSpecialNew(QMouseEvent*)));
     writeToFile();
     readFromFile();
@@ -66,6 +66,72 @@ void MainWindow::setinit()
     current->setGeometry(QRect(70,20,70,30));
     connect(current, SIGNAL(clicked(bool)), this, SLOT(currentTime()));
 
+    //my time zone
+    const QDateTime dateTime1 = QDateTime::currentDateTime();
+    const QDateTime dateTime2 = QDateTime(dateTime1.date(), dateTime1.time(), Qt::UTC);
+    myTimeZone = dateTime1.secsTo(dateTime2) / 3600;
+    QLabel *myZone = new QLabel(this);
+    myZone->setGeometry(rightX+140,55,80,50);
+    if(myTimeZone<=14 && myTimeZone>0)
+    {
+        myZone->setText("月    +"+QString::number(myTimeZone)+"区");
+    }
+    else if(myTimeZone>=-14 && myTimeZone<=0)
+    {
+        myZone->setText("月    "+QString::number(myTimeZone)+"区");
+    }
+
+    //your time zone
+    QLabel *zone = new QLabel("对方时区：", this);
+    zone->setGeometry(QRect(480,20,70,30));
+    yourTimeZone = myTimeZone;
+    yourZone = new QLabel("+"+QString::number(yourTimeZone)+"区", this);
+    yourZone->setGeometry(QRect(550,20,40,30));
+
+    //set your time zone
+    QPushButton *editZone = new QPushButton(this);
+    editZone->setText("修改对方时区");
+    editZone->setGeometry(QRect(590,20,130,30));
+    editZoneBt = editZone;
+    QObject::connect(editZoneBt, SIGNAL(clicked(bool)), this, SLOT(editTimeZone()));
+    QLineEdit *lineEdit = new QLineEdit(this);
+    lineEdit->setGeometry(QRect(590,20,150,30));
+    lineEdit->setPlaceholderText("请输入-14～14的整数");
+    lineEdit->hide();
+    lineEditZone = lineEdit;
+    QPushButton *confirmZone = new QPushButton(this);
+    confirmZone->setGeometry(QRect(750,20,50,30));
+    confirmZone->setText("确定");
+    confirmZone->hide();
+    confirmZoneBt = confirmZone;
+
+    // Update Date Button
+    QPushButton *updateButton = new QPushButton(this);
+    updateButton->setText("更新");
+    updateButton->setGeometry(QRect(800,150,100,40));
+    QObject::connect(updateButton,SIGNAL(clicked(bool)),this,SLOT(updatedata()));
+
+    // Go to a specific date
+    QPushButton *goToBt = new QPushButton(this);
+    goToBt->setGeometry(QRect(800,200,100,40));
+    goToBt->setText("搜索日期");
+    gotoBt = goToBt;
+    QObject::connect(gotoBt, SIGNAL(clicked(bool)), this, SLOT(editCurrTime()));
+    QLabel *goTo = new QLabel("跳转到", this);
+    goTo->setGeometry(QRect(800,215,50,40));
+    goTo->hide();
+    gotoLabel = goTo;
+    QDateEdit *date = new QDateEdit(QDate::currentDate(),this);
+    date->setGeometry(QRect(800,250,150,25));
+    date->setDisplayFormat("yyyy/MM/dd");
+    date->hide();
+    dateEdit = date;
+    QPushButton *confirmDate = new QPushButton(this);
+    confirmDate->setText("确定");
+    confirmDate->setGeometry(QRect(880,285,70,40));
+    confirmDate->hide();
+    confirmDateBt = confirmDate;
+
     int i;
     //add the vertical time zone
     for(i=1; i<12; i++)
@@ -82,7 +148,7 @@ void MainWindow::setinit()
     month->setFont(font);
     month->setStyleSheet("color: #444444");
     month->setAlignment(Qt::AlignCenter);
-    month->setGeometry(QRect(rightX + 60,40,100,50));
+    month->setGeometry(QRect(rightX + 60,40,100,55));
     for (int i=0; i<7; i++) {
         QLabel *weekLabel = new QLabel(this);
         weekLabels[i] = weekLabel;
@@ -95,16 +161,10 @@ void MainWindow::setinit()
     //yourlist = new QList<Event*>();
 
     detailLabel = new QLabel(this);
-    detailLabel->setGeometry(rightX+20,topY+50,200,300);
+    detailLabel->setGeometry(rightX+35,topY+160,200,300);
 
     // Read settings
     Event::defaultDuration = 60;
-
-    // Update Date Button
-    QPushButton *updateButton = new QPushButton(this);
-    updateButton->setText("更新");
-    updateButton->setGeometry(QRect(800,150,100,40));
-    QObject::connect(updateButton,SIGNAL(clicked(bool)),this,SLOT(updatedata()));
 }
 
 void MainWindow::setWindowStyle() {
@@ -147,13 +207,75 @@ void MainWindow::paintEvent(QPaintEvent *)
     painter->end();
 }
 
+void MainWindow::editCurrTime()
+{
+    gotoBt->hide();
+    gotoLabel->show();
+    dateEdit->show();
+    confirmDateBt->show();
+    QObject::connect(confirmDateBt,SIGNAL(clicked(bool)),this,SLOT(todate()));
+}
+
+void MainWindow::todate()
+{
+    gotoBt->show();
+    gotoLabel->hide();
+    dateEdit->hide();
+    confirmDateBt->hide();
+    QDate curr_date = QDate::currentDate();
+    offset = (curr_date.addDays(-1*curr_date.dayOfWeek()).daysTo(dateEdit->date().addDays(-1 * dateEdit->date().dayOfWeek()))) / 7;
+    refreshAgenda(offset);
+}
+
+void MainWindow::editTimeZone()
+{
+    editZoneBt->hide();
+    lineEditZone->show();
+    confirmZoneBt->show();
+    connect(confirmZoneBt,SIGNAL(clicked()),this,SLOT(toEditZone()),Qt::UniqueConnection);
+}
+
+void MainWindow::toEditZone()
+{
+    if(lineEditZone->text().toInt()<=14 && lineEditZone->text().toInt()>0)
+    {
+        yourTimeZone = lineEditZone->text().toInt();
+        yourZone->setText("+"+QString::number(yourTimeZone)+"区");
+    }
+    else if(lineEditZone->text().toInt()>=-14 && lineEditZone->text().toInt()<=0)
+    {
+        yourTimeZone = lineEditZone->text().toInt();
+        yourZone->setText(QString::number(yourTimeZone)+"区");
+    }
+    else
+    {
+        notTimeZone();
+    }
+    editZoneBt->show();
+    lineEditZone->hide();
+    confirmZoneBt->hide();
+    //改变对方事件ui
+    refreshAgenda(offset);
+}
+
 EventLabel* MainWindow::addEventUI(Event *event)
 {
+    QDateTime start = event->eventStart;
+    QDateTime end = event->eventEnd;
+    if(event->eventType == 1)
+    {
+        start = event->eventStart.addSecs((yourTimeZone-myTimeZone)*3600);
+        end = event->eventEnd.addSecs((yourTimeZone-myTimeZone)*3600);
+    }
     QString weekStrings[7] = {"周一","周二","周三","周四","周五","周六","周日"};
-    QString weekStart = event->eventStart.toString("ddd");
-    int startminute = 60*event->eventStart.toString("HH").toInt() + event->eventStart.toString("mm").toInt();
-    int endminute = 60*event->eventEnd.toString("HH").toInt() + event->eventEnd.toString("mm").toInt();
-
+    QString weekStart = start.toString("ddd");
+    int startminute = 60*start.toString("HH").toInt() + start.toString("mm").toInt();
+    int endminute = 60*end.toString("HH").toInt() + end.toString("mm").toInt();
+//    if(startminute > endminute)
+//    {
+//        connect(this,SIGNAL(diffDaysSignal()),this,SLOT(diffDays()),Qt::UniqueConnection);
+//        emit diffDaysSignal();
+//    }
     for(int j=0; j<7; j++)
     {
         if(weekStart == weekStrings[j])
@@ -226,8 +348,6 @@ void MainWindow::refreshAgenda(int _offset)
         weekLabel->setStyleSheet("color: #aaaaaa");
         if( weekStrings[i] == curr_time.toString("ddd") )
         {
-
-
             //month information
             month->setText(curr_time.addDays(-i).toString("M"));
 
@@ -368,6 +488,7 @@ void MainWindow::deleteEvent(QString name, QString place, QDateTime starttime, Q
             list->removeAt(k);
             delete _event->eventUI;
             delete _event;
+            detailLabel->hide();
             refreshAgenda(offset);
 
             //从数据库删除
@@ -397,6 +518,7 @@ void MainWindow::loadFromDB()
        list->append(event);
     }
 }
+
 void MainWindow::eventsLoseFocus()
 {
     for(int k = 0; k < list->size(); k++)
@@ -496,11 +618,16 @@ void MainWindow::readFromFile() //接收对方文件时
         }
         QDateTime starttime = QDateTime::fromString(Start, "yyyy/MM/dd HH:mm");
         QDateTime endtime = QDateTime::fromString(End, "yyyy/MM/dd HH:mm");
+        //set time zone of the other
+        QTimeZone zone(yourTimeZone*3600);
+        starttime.setTimeZone(zone);
+        endtime.setTimeZone(zone);
         if(Type != "0") //对于对方来说是0事件
         {
             qDebug() << "type=" <<Type << "error";
         }
         int type = 1; //储存为1事件
+
         createNewEvent(Name, Place, starttime, endtime, type);
     }
 }
@@ -515,6 +642,26 @@ void MainWindow::showDetail(Event* event) {
 
 void MainWindow::updatedata()
 {
-    tcp->show();
-    tcp->senderSetinit();
+    TcpClient *tcpClient = new TcpClient(this, &YourEventList);
+    tcpClient->setGeometry(leftX+750,topY+280,220,220);
+    tcpClient->setFixedSize(220,220);
+    tcpClient->show();
+}
+
+void MainWindow::notTimeZone()
+{
+    QMessageBox messageBox(this);
+    messageBox.setText("请输入合法时区！");
+    QAbstractButton *confirmBt = messageBox.addButton(QMessageBox::Ok);
+    messageBox.exec();
+    connect(confirmBt, SIGNAL(clicked(bool)), this, SLOT(close()));
+}
+
+void MainWindow::diffDays()
+{
+    QMessageBox messageBox(this);
+    messageBox.setText("不能添加跨天事件！");
+    QAbstractButton *confirmBt = messageBox.addButton(QMessageBox::Ok);
+    messageBox.exec();
+    connect(confirmBt, SIGNAL(clicked(bool)), this, SLOT(close()));
 }

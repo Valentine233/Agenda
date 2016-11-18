@@ -1,7 +1,8 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include "tcp.h"
+#include "tcpclient.h"
+#include "tcpserver.h"
 #include "ui_mainwindow.h"
 #include <QMainWindow>
 #include <QWidget>
@@ -31,7 +32,10 @@
 #include "event.h"
 #include <QTextCodec>
 #include <QCoreApplication>
-class Tcp;
+#include <QDateEdit>
+
+class TcpClient;
+class TcpServer;
 namespace Ui {
 class MainWindow;
 }
@@ -45,6 +49,11 @@ public:
     ~MainWindow();
     int offset;
     static QDateTime curr_time;
+    QDateEdit *dateEdit;
+    QDate chooseDate;
+    QPushButton *gotoBt;
+    QLabel *gotoLabel;
+    QPushButton *confirmDateBt;
     void refreshAgenda(int offset);
     void setinit();
     QTextStream MyEvent;
@@ -62,9 +71,15 @@ public:
     DB* db;
     QFile MyEventList;
     QFile YourEventList;
-    Tcp *tcp;
+    TcpServer *tcpServer;
     void eventsLoseFocus();
     QLabel* detailLabel;
+    int myTimeZone;
+    int yourTimeZone;
+    QLabel *yourZone;
+    QLineEdit *lineEditZone;
+    QPushButton *editZoneBt;
+    QPushButton *confirmZoneBt;
     QString myColorDefault = "MyEventLabel {background-color: rgba(173,210,255,0.8); color: #333333}";
     QString myColorFocus = "MyEventLabel {background-color: rgba(108,174,255,0.8); color:white}";
     QString yourColorDefault = "YourEventLabel {background-color: rgba(240, 54, 60, 50); color: #333333}";
@@ -72,6 +87,7 @@ public:
 
 signals:
     void openNewSignal(QMouseEvent *);
+    void diffDaysSignal();
 
 public slots:
     void forward();
@@ -89,6 +105,12 @@ public slots:
     void readFromFile();
     void showDetail(Event*);
     void updatedata();
+    void editTimeZone();
+    void toEditZone();
+    void todate();
+    void notTimeZone();
+    void editCurrTime();
+    void diffDays();
 
 private:
     Ui::MainWindow *ui;
