@@ -7,13 +7,18 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QFile>
+#include <QSqlQuery>
+#include <QSql>
+#include <QSqlRecord>
+#include <mainwindow.h>
 
 class TcpClient : public QDialog
 {
     Q_OBJECT
 public:
-    TcpClient(QWidget *parent, QFile *YourEventList);
+    TcpClient(QWidget *parent);
     void setinit();
+    void readFromFile();
 
 private slots:
     void send();  //连接服务器
@@ -33,7 +38,7 @@ private:
     qint64 bytesReceived;  //已收到数据的大小
     qint64 fileNameSize;  //文件名的大小信息
     QString fileName;   //存放文件名
-    QFile *localFile;   //本地文件
+    QFile *localFile = new QFile();   //本地文件
     QByteArray inBlock;   //数据缓冲区
 //    QFile *localFile;  //要发送的文件
 //    qint64 totalBytes;  //数据总大小

@@ -24,9 +24,9 @@ qrc_*.cpp
 ui_*.h
 Makefile*
 *build-*
-
+*.txt
 # QtCreator
-
+*.rtf
 *.autosave
 
 # QtCtreator Qml
