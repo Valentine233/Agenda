@@ -61,8 +61,9 @@ void TcpClient::acceptfile()  //对方已接受连接
 
 void TcpClient::updateClientProgress()  //更新进度条，接收数据
 {
+   qDebug() << "duang";
    QDataStream in(tcpClient);
-   in.setVersion(QDataStream::Qt_4_6);
+   in.setVersion(QDataStream::Qt_5_7);
    if(bytesReceived <= sizeof(qint64)*2)
    { //如果接收到的数据小于16个字节，那么是刚开始接收数据，我们保存到//来的头文件信息
        if((tcpClient->bytesAvailable() >= sizeof(qint64)*2)
@@ -74,7 +75,11 @@ void TcpClient::updateClientProgress()  //更新进度条，接收数据
        if((tcpClient->bytesAvailable() >= fileNameSize)
            && (fileNameSize != 0))
        {  //接收文件名，并建立文件
+           qDebug() << fileName;
+//           QString tmpFileName;
            in >> fileName;
+//           fileName = localFile->fileName();
+           qDebug() << fileName;
            status->setText(tr("接收文件 %1 ...").arg(fileName));
            bytesReceived += fileNameSize;
            if(!localFile->open(QFile::WriteOnly))

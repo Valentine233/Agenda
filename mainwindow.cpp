@@ -79,7 +79,11 @@ void MainWindow::setinit()
     //your time zone
     QLabel *zone = new QLabel("对方时区：", this);
     zone->setGeometry(QRect(480,20,70,30));
-    yourTimeZone = myTimeZone;
+    QSettings settings("Valentine", "Agenda");
+    if (settings.allKeys().contains("yourTimeZone"))
+        yourTimeZone = settings.value("yourTimeZone").toInt();
+    else
+        yourTimeZone = myTimeZone;
     yourZone = new QLabel("+"+QString::number(yourTimeZone)+"区", this);
     yourZone->setGeometry(QRect(550,20,40,30));
 
@@ -249,6 +253,8 @@ void MainWindow::toEditZone()
     editZoneBt->show();
     lineEditZone->hide();
     confirmZoneBt->hide();
+    QSettings settings("Valentine", "Agenda");
+    settings.setValue("yourTimeZone", yourTimeZone);
     //改变对方事件ui
     refreshAgenda(offset);
 }

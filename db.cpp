@@ -12,7 +12,7 @@ DB::DB()
     query = QSqlQuery(db);
     query.exec("CREATE TABLE IF NOT EXISTS event (id INTEGER PRIMARY KEY AUTOINCREMENT,"
                "name NVARCHAR(20) NOT NULL,"
-               "place NVARCHAR(20) NOT NULL,"
+               "place NVARCHAR(20),"
                "starttime NVARCHAR(50) NOT NULL,"
                "endtime NVARCHAR(50) NOT NULL,"
                "type INTEGER NOT NULL);");
