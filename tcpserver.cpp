@@ -1,14 +1,17 @@
 #include "tcpserver.h"
 
-TcpServer::TcpServer(QWidget *parent, QFile *MyEventList) : QDialog(parent)
+TcpServer::TcpServer(QWidget *parent) : QDialog(parent)
 {
-    localFile = MyEventList;
+    if (!QDir(QStandardPaths::writableLocation(QStandardPaths::DataLocation)).exists())
+        QDir().mkdir(QStandardPaths::writableLocation(QStandardPaths::DataLocation));
+    localFile->setFileName(QStandardPaths::writableLocation(QStandardPaths::DataLocation) +"/MyEventList.txt");
     fileName = localFile->fileName();
     totalBytes = 0;
 
     //当发现新连接时发出newConnection()信号，弹出对话框
     connect(&tcpServer,SIGNAL(newConnection()),this,SLOT(requestDialog()));
     tcpServer.listen(QHostAddress::LocalHost,6666);
+
 //    if(!tcpServer.listen(QHostAddress::LocalHost,6666))
 //    {
 //       qDebug() << tcpServer.errorString();
@@ -24,14 +27,23 @@ void TcpServer::requestDialog()
     QAbstractButton *rejectBt = messageBox.addButton(QMessageBox::No);
     QAbstractButton *acceptBt = messageBox.addButton(QMessageBox::Yes);
     messageBox.exec();
+    if (messageBox.clickedButton() == acceptBt) {
+        writeToFile();
+        setinit();
+        acceptConnection();
+    }
+    if (messageBox.clickedButton() == rejectBt) {
+        this->close();
+    }
     //如果确认接收，开始连接
-    connect(acceptBt, SIGNAL(clicked(bool)), this, SLOT(setinit()));
-    connect(acceptBt, SIGNAL(clicked(bool)), this, SLOT(acceptConnection()));
-    connect(acceptBt, SIGNAL(clicked(bool)), this, SLOT(close()));
+//    connect(acceptBt, SIGNAL(clicked(bool)), this, SLOT(setinit()));
+//    connect(acceptBt, SIGNAL(clicked(bool)), this, SLOT(acceptConnection()));
+//    connect(rejectBt, SIGNAL(clicked(bool)), this, SLOT(close()));
 }
 
 void TcpServer::setinit()
 {
+    qDebug() << "Setinit";
     status->setGeometry(30,70,160,40);
     status->show();
     confirmBt->setText("确认");
@@ -39,7 +51,7 @@ void TcpServer::setinit()
     confirmBt->setEnabled(false);
     confirmBt->show();
     connect(confirmBt,SIGNAL(clicked(bool)),this,SLOT(close()));
-
+    this->show();
 }
 
 //void TcpServer::start() //开始监听
@@ -60,19 +72,21 @@ void TcpServer::acceptConnection()  //接受连接
     tcpServerConnection = tcpServer.nextPendingConnection();
 //    connect(tcpServerConnection,SIGNAL(readyRead()),this,SLOT(updateServerProgress()));
     //当有数据发送成功时，我们更新进度
+    qDebug() << "Connected";
     connect(tcpServerConnection,SIGNAL(bytesWritten(qint64)),this,SLOT(updateServerProgress(qint64)));
     connect(tcpServerConnection,SIGNAL(error(QAbstractSocket::SocketError)),this,
            SLOT(displayError(QAbstractSocket::SocketError)));
-    status->setText(tr("接受连接"));
+    status->setText(tr("对方接受连接"));
     startTransfer();
     tcpServer.close();
 }
 
 void TcpServer::startTransfer()  //实现文件大小等信息的发送
 {
+    qDebug() << "TcpServer::startTransfer()";
     if(!localFile->open(QFile::ReadOnly))
     {
-       qDebug() << "open file error!";
+       qDebug() << "TcpServer::startTransfer()" << localFile->errorString();
        return;
     }
 
@@ -103,6 +117,7 @@ void TcpServer::startTransfer()  //实现文件大小等信息的发送
 //更新进度，实现文件的传送
 void TcpServer::updateServerProgress(qint64 numBytes)
 {
+    qDebug() << "TcpServer::updateServerProgress";
     //已经发送数据的大小
     bytesWritten += (int)numBytes;
 
@@ -181,4 +196,33 @@ void TcpServer::displayError(QAbstractSocket::SocketError) //错误处理
     qDebug() << tcpServerConnection->errorString();
     tcpServerConnection->close();
     status->setText(tr("发送错误"));
+}
+void TcpServer::writeToFile() //传出我的文件时
+{
+    //未实现抹去MyEventList文件内容！
+    if (!localFile->open(QIODevice::WriteOnly | QIODevice::Text))
+    {
+        qDebug()<<"WriteError: Can't open the file!\n";
+        return;
+    }
+    QTextStream out(localFile);
+    QSqlQuery query =  ((MainWindow*)parent())->db->readAllMyEvent();
+    QSqlRecord record = query.record();
+    int idName = record.indexOf("name");
+    int idPlace = record.indexOf("place");
+    int idStart = record.indexOf("starttime");
+    int idEnd = record.indexOf("endtime");
+    int idType = record.indexOf("type");
+    while (query.next())
+    {
+       QString name = query.value(idName).toString();
+       QString place = query.value(idPlace).toString();
+       QDateTime starttime = QDateTime::fromString(query.value(idStart).toString());
+       QDateTime endtime = QDateTime::fromString(query.value(idEnd).toString());
+       int type = query.value(idType).toString().toInt();
+       QString start = starttime.toString("yyyy/MM/dd HH:mm");
+       QString end = endtime.toString("yyyy/MM/dd HH:mm");
+       out<<name<<",;"<<place<<",;"<<start<<",;"<<end<<",;"<<type<<"\n";
+    }
+    localFile->close();
 }

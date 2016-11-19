@@ -191,7 +191,7 @@ void Tcp::updateServerProgress()  //接收数据
            rcFile= new QFile(rcFileName);
            if(!rcFile->open(QFile::WriteOnly))
            {
-                qDebug() << "open file error!";
+                qDebug() << "Tcp::updateServerProgress():open file error!";
                 return;
            }
        }

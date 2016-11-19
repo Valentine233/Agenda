@@ -11,13 +11,10 @@ MainWindow::MainWindow(QWidget *parent) :
     setinit();
     setWindowStyle();
     setWindowTitle(tr("Agenda"));
-    QString runPath = QCoreApplication::applicationDirPath();
-    MyEventList.setFileName(runPath+"/MyEventList.txt");
-    YourEventList.setFileName(runPath+"/YourEventList.txt");
-    tcpServer = new TcpServer(this ,&MyEventList);
+    tcpServer = new TcpServer(this);
     tcpServer->setGeometry(MainWindow::leftX+750,MainWindow::topY+280,220,220);
     tcpServer->setFixedSize(220,220);
-    tcpServer->hide();
+//    tcpServer->hide();
     db = new DB();
 //    db->dropDB();
     loadFromDB();
@@ -25,8 +22,6 @@ MainWindow::MainWindow(QWidget *parent) :
     refreshAgenda(offset);
     // trans: a new special event is created
     QObject::connect(this, SIGNAL(openNewSignal(QMouseEvent*)), this, SLOT(openSpecialNew(QMouseEvent*)));
-    writeToFile();
-    readFromFile();
 //    QTextCodec::setCodecForTr(QTextCodec::codecForName("UTF-8"));
 }
 
@@ -386,6 +381,7 @@ void MainWindow::backwards()
 
 void MainWindow::currentTime()
 {
+    tcpServer->show();
     refreshAgenda(0);
 }
 
@@ -539,99 +535,6 @@ void MainWindow::mousePressEvent(QMouseEvent *event)
     eventsLoseFocus();
     event->accept();
 }
-
-void MainWindow::writeToFile() //传出我的文件时
-{
-    //未实现抹去MyEventList文件内容！
-    if (!MyEventList.open(QIODevice::WriteOnly | QIODevice::Text))
-    {
-        qDebug()<<"WriteError: Can't open the file!\n";
-        return;
-    }
-    QTextStream out(&MyEventList);
-    QSqlQuery query =  db->readAllMyEvent();
-    QSqlRecord record = query.record();
-    int idName = record.indexOf("name");
-    int idPlace = record.indexOf("place");
-    int idStart = record.indexOf("starttime");
-    int idEnd = record.indexOf("endtime");
-    int idType = record.indexOf("type");
-    while (query.next())
-    {
-       QString name = query.value(idName).toString();
-       QString place = query.value(idPlace).toString();
-       QDateTime starttime = QDateTime::fromString(query.value(idStart).toString());
-       QDateTime endtime = QDateTime::fromString(query.value(idEnd).toString());
-       int type = query.value(idType).toString().toInt();
-       QString start = starttime.toString("yyyy/MM/dd HH:mm");
-       QString end = endtime.toString("yyyy/MM/dd HH:mm");
-       out<<name<<",;"<<place<<",;"<<start<<",;"<<end<<",;"<<type<<"\n";
-    }
-}
-
-void MainWindow::readFromFile() //接收对方文件时
-{
-    //未实现替换现有YourEventList文件！
-    db->deleteAllYourEvent();
-    if(!YourEventList.open(QIODevice::ReadWrite | QIODevice::Text))
-    {
-         qDebug()<<"ReadError: Can't open the file!\n";
-         return;
-    }
-    while(!YourEventList.atEnd()) {
-        QByteArray line = YourEventList.readLine();
-        QString str(line);
-        int i=0;
-        int flag=0;
-        QString Name, Place, Start, End, Type;
-        while(str[i]!='\x0')
-        {
-            while(str[i]!=',' || str[i+1]!=';')
-            {
-                switch (flag) {
-                case 0: //0:eventName
-                    Name += str[i];
-                    break;
-                case 1: //1:eventPlace
-                    Place += str[i];
-                    break;
-                case 2: //2:eventStart
-                    Start += str[i];
-                    break;
-                case 3: //3:eventEnd
-                    End += str[i];
-                    break;
-                case 4: //4:eventType
-                    Type += str[i];
-                    break;
-                default:
-                    break;
-                }
-                if(str[i+1] == '\x0' || str[i+1] == '\n')
-                    break;
-                i++;
-            }
-            if(flag!=4)
-                i++;
-            flag++;
-            i++;
-        }
-        QDateTime starttime = QDateTime::fromString(Start, "yyyy/MM/dd HH:mm");
-        QDateTime endtime = QDateTime::fromString(End, "yyyy/MM/dd HH:mm");
-        //set time zone of the other
-        QTimeZone zone(yourTimeZone*3600);
-        starttime.setTimeZone(zone);
-        endtime.setTimeZone(zone);
-        if(Type != "0") //对于对方来说是0事件
-        {
-            qDebug() << "type=" <<Type << "error";
-        }
-        int type = 1; //储存为1事件
-
-        createNewEvent(Name, Place, starttime, endtime, type);
-    }
-}
-
 void MainWindow::showDetail(Event* event) {
     detailLabel->setText("事件名称："+event->eventName+"\n"+"事件地点："+event->eventPlace+"\n"+"事件日期："
                          +event->eventStart.date().toString("yyyy/MM/dd")+"\n"
@@ -642,7 +545,7 @@ void MainWindow::showDetail(Event* event) {
 
 void MainWindow::updatedata()
 {
-    TcpClient *tcpClient = new TcpClient(this, &YourEventList);
+    TcpClient *tcpClient = new TcpClient(this);
     tcpClient->setGeometry(leftX+750,topY+280,220,220);
     tcpClient->setFixedSize(220,220);
     tcpClient->show();

@@ -69,8 +69,8 @@ public:
     const static int rightX = leftX + 14 * gridWidth;
     const static int bottomY = topY + 12 * gridHight;
     DB* db;
-    QFile MyEventList;
-    QFile YourEventList;
+//    QFile MyEventList;
+//    QFile YourEventList;
     TcpServer *tcpServer;
     void eventsLoseFocus();
     QLabel* detailLabel;
@@ -101,8 +101,8 @@ public slots:
     void deleteEvent(QString, QString, QDateTime, QDateTime, int);
     EventLabel* addEventUI(Event *);
     void loadFromDB();
-    void writeToFile();
-    void readFromFile();
+//    void writeToFile();
+//    void readFromFile();
     void showDetail(Event*);
     void updatedata();
     void editTimeZone();

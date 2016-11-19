@@ -7,13 +7,17 @@
 #include <QLabel>
 #include <QFile>
 #include <QMessageBox>
-
+#include <QSqlQuery>
+#include <QSql>
+#include <QSqlRecord>
+#include <mainwindow.h>
 class TcpServer : public QDialog
 {
     Q_OBJECT
 public:
-    TcpServer(QWidget *parent, QFile *MyEventList);
+    TcpServer(QWidget *parent);
     void startTransfer();
+    void writeToFile();
 
 private slots:
     //void start();   //开始监听
@@ -30,7 +34,7 @@ private:
     QPushButton *confirmBt = new QPushButton(this); //确认键
     QTcpServer tcpServer;
     QTcpSocket *tcpServerConnection;
-    QFile *localFile;  //要发送的文件
+    QFile *localFile = new QFile();  //要发送的文件
     qint64 totalBytes;  //数据总大小
     qint64 bytesWritten;  //已经发送数据大小
     qint64 bytesToWrite;   //剩余数据大小
