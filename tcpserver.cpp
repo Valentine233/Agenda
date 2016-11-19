@@ -10,7 +10,8 @@ TcpServer::TcpServer(QWidget *parent) : QDialog(parent)
 
     //当发现新连接时发出newConnection()信号，弹出对话框
     connect(&tcpServer,SIGNAL(newConnection()),this,SLOT(requestDialog()));
-    tcpServer.listen(QHostAddress::LocalHost,6666);
+    QHostAddress add;
+    tcpServer.listen(add,6666);
 
 //    if(!tcpServer.listen(QHostAddress::LocalHost,6666))
 //    {
@@ -197,6 +198,7 @@ void TcpServer::displayError(QAbstractSocket::SocketError) //错误处理
     tcpServerConnection->close();
     status->setText(tr("发送错误"));
 }
+
 void TcpServer::writeToFile() //传出我的文件时
 {
     //未实现抹去MyEventList文件内容！

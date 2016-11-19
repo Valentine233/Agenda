@@ -22,7 +22,6 @@ MainWindow::MainWindow(QWidget *parent) :
     refreshAgenda(offset);
     // trans: a new special event is created
     QObject::connect(this, SIGNAL(openNewSignal(QMouseEvent*)), this, SLOT(openSpecialNew(QMouseEvent*)));
-//    QTextCodec::setCodecForTr(QTextCodec::codecForName("UTF-8"));
 }
 
 MainWindow::~MainWindow()

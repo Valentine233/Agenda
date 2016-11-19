@@ -30,7 +30,6 @@
 #include "db.h"
 #include "opennew.h"
 #include "event.h"
-#include <QTextCodec>
 #include <QCoreApplication>
 #include <QDateEdit>
 

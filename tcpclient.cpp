@@ -177,5 +177,6 @@ void TcpClient::readFromFile() //接收对方文件时
 
         ((MainWindow*)parent())->createNewEvent(Name, Place, starttime, endtime, type);
     }
+    ((MainWindow*)parent())->refreshAgenda(((MainWindow*)parent())->offset);
     localFile->close();
 }
