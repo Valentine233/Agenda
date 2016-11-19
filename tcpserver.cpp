@@ -94,7 +94,7 @@ void TcpServer::startTransfer()  //实现文件大小等信息的发送
     totalBytes = localFile->size();
 
     QDataStream sendOut(&outBlock,QIODevice::WriteOnly);
-    sendOut.setVersion(QDataStream::Qt_4_6);
+    sendOut.setVersion(QDataStream::Qt_5_7);
     QString currentFileName = fileName.right(fileName.size() - fileName.lastIndexOf('/')-1);
 
     //依次写入总大小信息空间，文件名大小信息空间，文件名
@@ -125,11 +125,11 @@ void TcpServer::updateServerProgress(qint64 numBytes)
     {
    //每次发送loadSize大小的数据，这里设置为4KB，如果剩余的数据不足4KB，
    //就发送剩余数据的大小
-       outBlock = localFile->read(qMin(bytesToWrite,loadSize));
+       outBlock = localFile->readAll();
 
        //发送完一次数据后还剩余数据的大小
        bytesToWrite -= (int)tcpServerConnection->write(outBlock);
-
+       qDebug() << "write!!";
        //清空发送缓冲区
        outBlock.resize(0);
 

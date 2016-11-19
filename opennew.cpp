@@ -157,6 +157,9 @@ void OpenNew::setInit(int x, int y)
 
 void OpenNew::sendAdd() //myevent: type = 0,   yourevent: type = 1
 {
+    if (nameinput->text().trimmed().size() == 0) {
+        return;
+    }
     connect(this, SIGNAL(diffDaysSignal()), this, SLOT(diffDaysWarning()));
     QDateTime start(dateEdit->date(), starttime->dateTime().time());
     QDateTime end(dateEdit->date(), endtime->dateTime().time());
