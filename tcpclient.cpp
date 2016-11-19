@@ -48,7 +48,6 @@ void TcpClient::send()   //连接到服务器，执行发送
     status->setText(tr("连接中..."));
     tcpClient->connectToHost(hostEdit->text(),
                              portEdit->text().toInt());//连接
-
 }
 
 void TcpClient::acceptfile()  //对方已接受连接
