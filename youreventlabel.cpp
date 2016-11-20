@@ -5,7 +5,7 @@ YourEventLabel::YourEventLabel(QWidget* parent, Event* _event) : EventLabel(pare
     currEvent = _event;
     this->setStyleSheet("background-color: rgba(240, 54, 60, 50);text-align: center; ");
     QFont font = this->font();
-    font.setPointSize(10);
+    font.setPointSize(8);
     this->setFont(font);
     this->setAlignment(Qt::AlignCenter);
     this->show();

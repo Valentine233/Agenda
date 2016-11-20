@@ -15,7 +15,7 @@ MainWindow::MainWindow(QWidget *parent) :
     tcpServer->setGeometry(MainWindow::leftX+450,MainWindow::topY+280,220,220);
     tcpServer->setFixedSize(220,220);
     db = new DB();
-    // db->dropDB();
+//    db->dropDB();
     loadFromDB();
     offset = 0;
     refreshAgenda(offset);
@@ -32,30 +32,18 @@ void MainWindow::setinit()
 {
     // create a new general event
     QPushButton *create = new QPushButton ( "新事件", this);
-    create->setGeometry(QRect(800,100,100,40));
-//    create->setFlat(true);
-//    create->setIcon();
+    create->setGeometry(QRect(800,100,100,30));
     connect(create, SIGNAL(clicked(bool)), this, SLOT(openGeneralNew()));
     // to next week
     QPushButton *forward_button = new QPushButton ( ">", this);
-//    forward_button->setFlat(true);
-//    QPixmap forward_pixmap(":icon/forward");
-//    QIcon forwardIcon(forward_pixmap);
-//    forward_button->setIcon(forwardIcon);
-//    forward_button->setIconSize(QSize(30,30));
     forward_button->setGeometry(QRect(130,20,50,30));
     connect(forward_button, SIGNAL(clicked(bool)), this, SLOT(forward()));
     // to last week
     QPushButton *backwards_button = new QPushButton ( "<", this);
     backwards_button->setGeometry(QRect(30,20,50,30));
-//    backwards_button->setFlat(true);
-//    QPixmap back_pixmap(":icon/back");
-//    QIcon backIcon(back_pixmap);
-//    backwards_button->setIcon(backIcon);
     connect(backwards_button, SIGNAL(clicked(bool)), this, SLOT(backwards()));
     // back to the current week
     QPushButton *current = new QPushButton ( "今天", this);
-//    current->setFlat(true);
     current->setGeometry(QRect(70,20,70,30));
     connect(current, SIGNAL(clicked(bool)), this, SLOT(currentTime()));
 
@@ -64,19 +52,19 @@ void MainWindow::setinit()
     const QDateTime dateTime2 = QDateTime(dateTime1.date(), dateTime1.time(), Qt::UTC);
     myTimeZone = dateTime1.secsTo(dateTime2) / 3600;
     QLabel *myZone = new QLabel(this);
-    myZone->setGeometry(rightX+140,55,80,50);
+    myZone->setGeometry(350,20,100,30);
     if(myTimeZone<=14 && myTimeZone>0)
     {
-        myZone->setText("月    +"+QString::number(myTimeZone)+"区");
+        myZone->setText("我的时区：+"+QString::number(myTimeZone)+"区");
     }
     else if(myTimeZone>=-14 && myTimeZone<=0)
     {
-        myZone->setText("月    "+QString::number(myTimeZone)+"区");
+        myZone->setText("我的时区：+"+QString::number(myTimeZone)+"区");
     }
 
     //your time zone
     QLabel *zone = new QLabel("对方时区：", this);
-    zone->setGeometry(QRect(480,20,70,30));
+    zone->setGeometry(QRect(480,20,60,30));
     QSettings settings("Valentine", "Bi-Agenda");
     if (settings.allKeys().contains("yourTimeZone"))
         yourTimeZone = settings.value("yourTimeZone").toInt();
@@ -105,27 +93,27 @@ void MainWindow::setinit()
     // Update Date Button
     QPushButton *updateButton = new QPushButton(this);
     updateButton->setText("更新");
-    updateButton->setGeometry(QRect(800,150,100,40));
+    updateButton->setGeometry(QRect(800,140,100,30));
     QObject::connect(updateButton,SIGNAL(clicked(bool)),this,SLOT(updatedata()));
 
     // Go to a specific date
     QPushButton *goToBt = new QPushButton(this);
-    goToBt->setGeometry(QRect(800,200,100,40));
+    goToBt->setGeometry(QRect(800,180,100,30));
     goToBt->setText("搜索日期");
     gotoBt = goToBt;
     QObject::connect(gotoBt, SIGNAL(clicked(bool)), this, SLOT(editCurrTime()));
     QLabel *goTo = new QLabel("跳转到", this);
-    goTo->setGeometry(QRect(800,215,50,40));
+    goTo->setGeometry(QRect(800,180,50,30));
     goTo->hide();
     gotoLabel = goTo;
     QDateEdit *date = new QDateEdit(QDate::currentDate(),this);
-    date->setGeometry(QRect(800,250,150,25));
+    date->setGeometry(QRect(800,215,150,25));
     date->setDisplayFormat("yyyy/MM/dd");
     date->hide();
     dateEdit = date;
     QPushButton *confirmDate = new QPushButton(this);
     confirmDate->setText("确定");
-    confirmDate->setGeometry(QRect(880,285,70,40));
+    confirmDate->setGeometry(QRect(880,250,70,30));
     confirmDate->hide();
     confirmDateBt = confirmDate;
 
@@ -141,11 +129,15 @@ void MainWindow::setinit()
         label->setGeometry(QRect(0, 80+40*i, 50, 40));
     }
 
-    QFont font("Helvetica", 60);
+    QFont font("Helvetica", 40);
+    year->setFont(font);
     month->setFont(font);
     month->setStyleSheet("color: #444444");
+    year->setStyleSheet("color: #444444");
     month->setAlignment(Qt::AlignCenter);
-    month->setGeometry(QRect(rightX + 60,40,100,55));
+    year->setAlignment(Qt::AlignCenter);
+    month->setGeometry(QRect(rightX + 130,40,70,55));
+    year->setGeometry(QRect(rightX + 40,40,100,55));
     for (int i=0; i<7; i++) {
         QLabel *weekLabel = new QLabel(this);
         weekLabels[i] = weekLabel;
@@ -157,8 +149,8 @@ void MainWindow::setinit()
     list = new QList<Event*>();
 
     detailLabel = new QLabel(this);
-    detailLabel->setGeometry(rightX+35,topY+160,200,300);
-
+    detailLabel->setGeometry(rightX+35,topY+240,200,180);
+    detailLabel->hide();
     // Read settings
     Event::defaultDuration = 60;
 }
@@ -282,7 +274,7 @@ EventLabel* MainWindow::addEventUI(Event *event)
             {
                 MyEventLabel* eventRect = new MyEventLabel(this, event);
                 eventRect->setGeometry(50+100*j,100+480*startminute/(24*60),50,480*(endminute-startminute)/(24*60));
-                eventRect->setText(event->eventName+"\n"+event->eventPlace);
+                eventRect->setText(event->eventName.mid(0,5)+"\n"+event->eventPlace.mid(0,5));
                 event->eventUI = eventRect;
                 return eventRect;
             }
@@ -290,7 +282,7 @@ EventLabel* MainWindow::addEventUI(Event *event)
             {
                 YourEventLabel* eventRect = new YourEventLabel(this, event);
                 eventRect->setGeometry(100+100*j,100+480*startminute/(24*60),50,480*(endminute-startminute)/(24*60));
-                eventRect->setText(event->eventName+"\n"+event->eventPlace);
+                eventRect->setText(event->eventName.mid(0, 5)+"\n"+event->eventPlace.mid(0,5));
                 event->eventUI = eventRect;
                 return eventRect;
             }
@@ -352,7 +344,7 @@ void MainWindow::refreshAgenda(int _offset)
         {
             //month information
             month->setText(curr_time.addDays(-i).toString("M"));
-
+            year->setText(curr_time.addDays(-i).toString("yyyy") + ".");
             for( int j=0; j<7; j++)
             {
                 QLabel *dayLabel = dayLabels[j];

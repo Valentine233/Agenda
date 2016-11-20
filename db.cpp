@@ -76,8 +76,7 @@ void DB::deleteAllYourEvent()
     query.bindValue(":type", 1);
     if(!query.exec())
     {
-        qDebug() << "deleteAllYourEvent Error\n";
-        qDebug()<<query.lastError();
+        qDebug()<< "DB::deleteAllYourEvent()" << query.lastError();
     }
 }
 
@@ -101,6 +100,6 @@ void DB::updateEvent(QString name, QString place, QDateTime startTime, QDateTime
     query.bindValue(":oldend", endOld.toString());
     if(!query.exec())
     {
-        qDebug()<<query.lastError();
+        qDebug()<< "DB::updateEvent()" << query.lastError();
     }
 }

@@ -14,12 +14,6 @@ TcpServer::TcpServer(QWidget *parent) : QDialog(parent)
     QHostAddress add;
     tcpServer.listen(add,6666);
 
-//    if(!tcpServer.listen(QHostAddress::LocalHost,6666))
-//    {
-//       qDebug() << tcpServer.errorString();
-//       close();
-//       return;
-//    }
 }
 
 void TcpServer::requestDialog()

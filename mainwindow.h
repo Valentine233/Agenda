@@ -110,6 +110,7 @@ public slots:
 private:
     Ui::MainWindow *ui;
     QLabel *month = new QLabel(this);
+    QLabel *year = new QLabel(this);
     QLabel *dayLabels[7];
     QLabel *weekLabels[7];
     void setWindowStyle();

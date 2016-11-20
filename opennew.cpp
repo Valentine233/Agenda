@@ -63,7 +63,7 @@ void OpenNew::setInit(int x, int y)
     //单次日期
     dateEdit->setDate(eventDay);
     dateEdit->setDisplayFormat("yyyy/MM/dd");
-    dateEdit->setGeometry(20,105,150,25);
+    dateEdit->setGeometry(40,105,150,25);
 
     //重复日期
 
@@ -189,6 +189,9 @@ void OpenNew::sendAdd() //myevent: type = 0,   yourevent: type = 1
             id[i] = 1;
     }
     deleteTemp();
+    if (placeinput->text().length() == 0) {
+        placeinput->setText("");
+    }
     if(start.time() > end.time())
     {
         diffDays->show();
