@@ -7,8 +7,9 @@ TcpServer::TcpServer(QWidget *parent) : QDialog(parent)
     localFile->setFileName(QStandardPaths::writableLocation(QStandardPaths::DataLocation) +"/MyEventList.txt");
     fileName = localFile->fileName();
     totalBytes = 0;
+    setWindowTitle("Update Request");
 
-    //当发现新连接时发出newConnection()信号，弹出对话框
+    //当发现新连接时发出newConnection()信号，弹出询问对话框
     connect(&tcpServer,SIGNAL(newConnection()),this,SLOT(requestDialog()));
     QHostAddress add;
     tcpServer.listen(add,6666);
@@ -28,6 +29,7 @@ void TcpServer::requestDialog()
     QAbstractButton *rejectBt = messageBox.addButton(QMessageBox::No);
     QAbstractButton *acceptBt = messageBox.addButton(QMessageBox::Yes);
     messageBox.exec();
+    //如果确认接收，开始连接
     if (messageBox.clickedButton() == acceptBt) {
         writeToFile();
         setinit();
@@ -36,44 +38,25 @@ void TcpServer::requestDialog()
     if (messageBox.clickedButton() == rejectBt) {
         this->close();
     }
-    //如果确认接收，开始连接
-//    connect(acceptBt, SIGNAL(clicked(bool)), this, SLOT(setinit()));
-//    connect(acceptBt, SIGNAL(clicked(bool)), this, SLOT(acceptConnection()));
-//    connect(rejectBt, SIGNAL(clicked(bool)), this, SLOT(close()));
 }
 
 void TcpServer::setinit()
 {
-    qDebug() << "Setinit";
     status->setGeometry(30,70,160,40);
     status->show();
     confirmBt->setText("确认");
     confirmBt->setGeometry(90,160,100,20);
     confirmBt->setEnabled(false);
+    confirmBt->setStyleSheet("QPushButton {color: black;}");
     confirmBt->show();
     connect(confirmBt,SIGNAL(clicked(bool)),this,SLOT(close()));
     this->show();
 }
 
-//void TcpServer::start() //开始监听
-//{
-//    ui->startButton->setEnabled(false);
-//    bytesReceived =0;
-//    if(!tcpServer.listen(QHostAddress::LocalHost,6666))
-//    {
-//       qDebug() << tcpServer.errorString();
-//       close();
-//       return;
-//    }
-//    ui->serverStatusLabel->setText(tr("监听"));
-//}
-
 void TcpServer::acceptConnection()  //接受连接
 {
     tcpServerConnection = tcpServer.nextPendingConnection();
-//    connect(tcpServerConnection,SIGNAL(readyRead()),this,SLOT(updateServerProgress()));
-    //当有数据发送成功时，我们更新进度
-    qDebug() << "Connected";
+    //当有数据发送成功时，更新进度
     connect(tcpServerConnection,SIGNAL(bytesWritten(qint64)),this,SLOT(updateServerProgress(qint64)));
     connect(tcpServerConnection,SIGNAL(error(QAbstractSocket::SocketError)),this,
            SLOT(displayError(QAbstractSocket::SocketError)));
@@ -84,7 +67,6 @@ void TcpServer::acceptConnection()  //接受连接
 
 void TcpServer::startTransfer()  //实现文件大小等信息的发送
 {
-    qDebug() << "TcpServer::startTransfer()";
     if(!localFile->open(QFile::ReadOnly))
     {
        qDebug() << "TcpServer::startTransfer()" << localFile->errorString();
@@ -118,90 +100,44 @@ void TcpServer::startTransfer()  //实现文件大小等信息的发送
 //更新进度，实现文件的传送
 void TcpServer::updateServerProgress(qint64 numBytes)
 {
-    qDebug() << "TcpServer::updateServerProgress";
     //已经发送数据的大小
     bytesWritten += (int)numBytes;
 
-    if(bytesToWrite > 0) //如果已经发送了数据
-    {
-   //每次发送loadSize大小的数据，这里设置为4KB，如果剩余的数据不足4KB，
-   //就发送剩余数据的大小
+    if(bytesToWrite > 0) { //如果有待发送的数据
+       //发送所有数据
        outBlock = localFile->readAll();
-
        //发送完一次数据后还剩余数据的大小
        bytesToWrite -= (int)tcpServerConnection->write(outBlock);
-       qDebug() << "write!!";
        //清空发送缓冲区
        outBlock.resize(0);
-
-    } else {
+    }
+    else {
        localFile->close(); //如果没有发送任何数据，则关闭文件
     }
 
     if(bytesWritten == totalBytes) //发送完毕
     {
-     status->setText(tr("传送文件 %1 成功").arg(fileName));
+       status->setText(tr("传送文件成功"));
        localFile->close();
        tcpServerConnection->close();
+       confirmBt->setEnabled(true);
+       //重新监听连接请求
+       QHostAddress add;
+       tcpServer.listen(add,6666);
+       tcpServerConnection = new QTcpSocket;
     }
 }
-
-//void TcpServer::updateServerProgress()  //更新进度条，接收数据
-//{
-//   QDataStream in(tcpServerConnection);
-//   in.setVersion(QDataStream::Qt_4_6);
-//   if(bytesReceived <= sizeof(qint64)*2)
-//   { //如果接收到的数据小于16个字节，那么是刚开始接收数据，我们保存到//来的头文件信息
-//       if((tcpServerConnection->bytesAvailable() >= sizeof(qint64)*2)
-//           && (fileNameSize == 0))
-//       { //接收数据总大小信息和文件名大小信息
-//           in >> totalBytes >> fileNameSize;
-//           bytesReceived += sizeof(qint64) * 2;
-//       }
-//       if((tcpServerConnection->bytesAvailable() >= fileNameSize)
-//           && (fileNameSize != 0))
-//       {  //接收文件名，并建立文件
-//           in >> fileName;
-//           ui->serverStatusLabel->setText(tr("接收文件 %1 ...")
-//                                           .arg(fileName));
-//           bytesReceived += fileNameSize;
-//           localFile= new QFile(fileName);
-//           if(!localFile->open(QFile::WriteOnly))
-//           {
-//                qDebug() << "open file error!";
-//                return;
-//           }
-//       }
-//       else return;
-//   }
-//   if(bytesReceived < totalBytes)
-//   {  //如果接收的数据小于总数据，那么写入文件
-//      bytesReceived += tcpServerConnection->bytesAvailable();
-//      inBlock= tcpServerConnection->readAll();
-//      localFile->write(inBlock);
-//      inBlock.resize(0);
-//   }
-
-//   if(bytesReceived == totalBytes)
-//   { //接收数据完成时
-//    tcpServerConnection->close();
-//    localFile->close();
-//    ui->startButton->setEnabled(true);
-//ui->serverStatusLabel->setText(tr("接收文件 %1 成功！")
-//.arg(fileName));
-//   }
-//}
 
 void TcpServer::displayError(QAbstractSocket::SocketError) //错误处理
 {
     qDebug() << tcpServerConnection->errorString();
     tcpServerConnection->close();
-    status->setText(tr("发送错误"));
+    status->setText(tr("就绪"));
+    confirmBt->setEnabled(true);
 }
 
-void TcpServer::writeToFile() //传出我的文件时
+void TcpServer::writeToFile() //从数据库写入MyEventList文件中，再发送给对方
 {
-    //未实现抹去MyEventList文件内容！
     if (!localFile->open(QIODevice::WriteOnly | QIODevice::Text))
     {
         qDebug()<<"WriteError: Can't open the file!\n";

@@ -21,7 +21,6 @@ SOURCES += main.cpp\
     eventlabel.cpp \
     myeventlabel.cpp \
     youreventlabel.cpp \
-    tcp.cpp \
     tcpserver.cpp \
     tcpclient.cpp
 
@@ -32,16 +31,22 @@ HEADERS  += mainwindow.h \
     eventlabel.h \
     myeventlabel.h \
     youreventlabel.h \
-    tcp.h \
     tcpserver.h \
     tcpclient.h
 
 FORMS    += mainwindow.ui
 
-QT += sql
-
-QT += network
-
 RESOURCES += \
     style.qrc
 
+ICON = agenda1.icns
+
+QMAKE_INFO_PLIST +=
+
+DISTFILES += \
+    Info.plist \
+    agenda1.icns
+
+QT += sql
+
+QT += network

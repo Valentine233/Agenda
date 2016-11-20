@@ -36,7 +36,7 @@ void DB::addEvent(QString name, QString place, QDateTime startTime, QDateTime en
     bool success = query.exec();
     if (!success)
     {
-        qDebug()<<query.lastError();
+        qDebug()<<"addEvent:"<<query.lastError();
     }
 }
 

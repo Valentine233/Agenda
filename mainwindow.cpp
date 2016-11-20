@@ -10,13 +10,12 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     setinit();
     setWindowStyle();
-    setWindowTitle(tr("Agenda"));
+    setWindowTitle(tr("Bi-Agenda"));
     tcpServer = new TcpServer(this);
-    tcpServer->setGeometry(MainWindow::leftX+750,MainWindow::topY+280,220,220);
+    tcpServer->setGeometry(MainWindow::leftX+450,MainWindow::topY+280,220,220);
     tcpServer->setFixedSize(220,220);
-//    tcpServer->hide();
     db = new DB();
-//    db->dropDB();
+    // db->dropDB();
     loadFromDB();
     offset = 0;
     refreshAgenda(offset);
@@ -78,7 +77,7 @@ void MainWindow::setinit()
     //your time zone
     QLabel *zone = new QLabel("对方时区：", this);
     zone->setGeometry(QRect(480,20,70,30));
-    QSettings settings("Valentine", "Agenda");
+    QSettings settings("Valentine", "Bi-Agenda");
     if (settings.allKeys().contains("yourTimeZone"))
         yourTimeZone = settings.value("yourTimeZone").toInt();
     else
@@ -156,7 +155,6 @@ void MainWindow::setinit()
 
     // Initialize the event list, by reading from db
     list = new QList<Event*>();
-    //yourlist = new QList<Event*>();
 
     detailLabel = new QLabel(this);
     detailLabel->setGeometry(rightX+35,topY+160,200,300);
@@ -302,6 +300,8 @@ EventLabel* MainWindow::addEventUI(Event *event)
 
 void MainWindow::removeEventUI()
 {
+    if(list->size()==0)
+        return;
     for(int k = 0; k < list->size(); k++)
     {
         if (list->at(k)->eventUI != NULL) {
@@ -320,13 +320,16 @@ void MainWindow::refreshAgenda(int _offset)
     // QString weekStrings[7] = {"Mon","Tue","Wed","Thu","Fri","Sat","Sun"};
     QString weekStrings[7] = {"周一","周二","周三","周四","周五","周六","周日"};
     //add EventUI
-    for(int k = 0; k < list->size(); k++)
+    if(list->size() != 0)
     {
-        QDate curr_date = QDate::currentDate();
-        int offset_k = (curr_date.addDays(-1*curr_date.dayOfWeek()).daysTo(list->at(k)->eventStart.date().addDays(-1 * list->at(k)->eventStart.date().dayOfWeek()))) / 7;
-        if (offset == offset_k) {
-             //event is in this week
-            addEventUI(list->at(k));
+        for(int k = 0; k < list->size(); k++)
+        {
+            QDate curr_date = QDate::currentDate();
+            int offset_k = (curr_date.addDays(-1*curr_date.dayOfWeek()).daysTo(list->at(k)->eventStart.date().addDays(-1 * list->at(k)->eventStart.date().dayOfWeek()))) / 7;
+            if (offset == offset_k) {
+                 //event is in this week
+                addEventUI(list->at(k));
+            }
         }
     }
 
@@ -337,7 +340,6 @@ void MainWindow::refreshAgenda(int _offset)
 //        pe_defalt.setColor(QPalette::WindowText, QColor(81,81,81,100));
 //        QPalette pe;
 //        pe.setColor(QPalette::WindowText,QColor(0,0,0,100));
-
         QLabel *dayLabel = dayLabels[i];
         dayLabel->setStyleSheet("color: #666666");
         QLabel *weekLabel = weekLabels[i];
@@ -386,7 +388,6 @@ void MainWindow::backwards()
 
 void MainWindow::currentTime()
 {
-    tcpServer->show();
     refreshAgenda(0);
 }
 
@@ -425,10 +426,26 @@ void MainWindow::turnToEventTime(Event *event)
 
 void MainWindow::createNewEvent(QString name, QString place, QDateTime starttime, QDateTime endtime, int type)
 {
-    Event *event = new Event(name,place,starttime,endtime,type,this);
-    list->append(event);
-    db->addEvent(name,place,starttime,endtime,type);
-    turnToEventTime(event);
+    int flag = 0; // if there is already the same event, don't create
+    if(list->size()!=0)
+    {
+        for(int k = 0; k < list->size(); k++)
+        {
+            if (list->at(k)->eventName == name && list->at(k)->eventPlace == place && list->at(k)->eventStart == starttime
+                    && list->at(k)->eventEnd == endtime && list->at(k)->eventType == type)
+            {
+                flag++;
+            }
+        }
+    }
+
+    if(flag == 0)
+    {
+        Event *event = new Event(name,place,starttime,endtime,type,this);
+        list->append(event);
+        db->addEvent(name,place,starttime,endtime,type);
+        turnToEventTime(event);
+    }
 }
 
 void MainWindow::createNewEventPl(QString name,QString place,QDate startdate,
@@ -461,6 +478,8 @@ void MainWindow::createNewEventPl(QString name,QString place,QDate startdate,
 
 void MainWindow::editEvent(QString name, QString place, QDateTime starttime, QDateTime endtime, int type, QString nameOld, QString placeOld, QDateTime startOld, QDateTime endOld)
 {
+    if(list->size()==0)
+        return;
     for(int k = 0; k < list->size(); k++)
     {
         if (list->at(k)->eventName == nameOld && list->at(k)->eventPlace == placeOld && list->at(k)->eventStart == startOld
@@ -480,6 +499,8 @@ void MainWindow::editEvent(QString name, QString place, QDateTime starttime, QDa
 
 void MainWindow::deleteEvent(QString name, QString place, QDateTime starttime, QDateTime endtime, int type)
 {
+    if(list->size()==0)
+        return;
     for(int k = 0; k < list->size(); k++)
     {
         if (list->at(k)->eventName == name && list->at(k)->eventPlace == place && list->at(k)->eventStart == starttime
@@ -522,6 +543,8 @@ void MainWindow::loadFromDB()
 
 void MainWindow::eventsLoseFocus()
 {
+    if(list->size()==0)
+        return;
     for(int k = 0; k < list->size(); k++)
     {
         if (list->at(k)->eventUI != NULL) {

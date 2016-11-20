@@ -29,6 +29,8 @@ public:
     QPushButton* confirmButton = new QPushButton(this);
     QPushButton* deleteButton = new QPushButton(this);
     QButtonGroup *weekdays = new QButtonGroup(this);
+    QLabel *namevide = new QLabel(this);
+    QLabel *diffDays = new QLabel(this);
 
 signals:
     void transAdd(QString, QString, QDateTime, QDateTime, int);
@@ -36,7 +38,6 @@ signals:
     void transEdit(QString, QString, QDateTime, QDateTime, int, QString, QString, QDateTime, QDateTime);
     void transDelete(QString, QString, QDateTime, QDateTime, int);
     void deleteConfirm(QString, QString, QDateTime, QDateTime, int);
-    void diffDaysSignal();
 
 public slots:
     void TimeChoose(int id);
@@ -45,7 +46,6 @@ public slots:
     void sendDelete();
     void deleteTemp();
     void deleteEventConfirm(QString name, QString place, QDateTime startTime, QDateTime endTime, int type);
-    void diffDaysWarning();
 
 private:
     QLineEdit* nameinput = new QLineEdit(this);

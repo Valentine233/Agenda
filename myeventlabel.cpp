@@ -26,17 +26,13 @@ void MyEventLabel::mousePressEvent(QMouseEvent *event) {
     //右键，编辑或删除
     else if(event->button() == Qt::RightButton)
     {
-        ((MainWindow*)parent())->eventsLoseFocus();
-        this->setStyleSheet("EventLabel {background-color: rgba(34, 24, 245, 90); text-align: center; }");
-        this->setStyleSheet(((MainWindow*)this->parent())->myColorDefault);
-        event->accept();
 //        ((MainWindow*)parent())->eventsLoseFocus();
 //        this->setStyleSheet("EventLabel {background-color: rgba(34, 24, 245, 90); text-align: center; }");
-
+//        this->setStyleSheet(((MainWindow*)this->parent())->myColorDefault);
 //        QMenu *menu = new QMenu(this);
 //        QAction *editAction = new QAction("编辑", this);
 //        menu->addAction(editAction);
-//        connect(editAction, SIGNAL(triggered()), this, SLOT(menuModify()));
+//        connect(editAction, SIGNAL(triggered()), this, SLOT(menuModify(Event*)));
 //        QAction *deleteAction = new QAction("删除", this);
 //        OpenNew editWindow((MainWindow*)parent());
 //        connect(deleteAction, SIGNAL(deleteConfirmSign(QString, QString, QDateTime, QDateTime, int)), editWindow, SLOT(deleteEventConfirm(QString, QString, QDateTime, QDateTime, int)));

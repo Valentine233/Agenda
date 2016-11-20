@@ -2,7 +2,7 @@
 
 TcpClient::TcpClient(QWidget *parent) : QDialog(parent)
 {
-//    qDebug() << QStandardPaths::writableLocation(QStandardPaths::DataLocation);
+    //store file in a writable location
     if (!QDir(QStandardPaths::writableLocation(QStandardPaths::DataLocation)).exists())
         QDir().mkdir(QStandardPaths::writableLocation(QStandardPaths::DataLocation));
     localFile->setFileName(QStandardPaths::writableLocation(QStandardPaths::DataLocation) + "/YourEventList.txt");
@@ -11,17 +11,13 @@ TcpClient::TcpClient(QWidget *parent) : QDialog(parent)
     bytesReceived = 0;
     fileNameSize = 0;
     tcpClient = new QTcpSocket(this);
-    //当发现新连接时发出newConnection()信号
+    //when emit connected signal, know that the connection has been accepted
     connect(tcpClient,SIGNAL(connected()),this,SLOT(acceptfile()));
     connect(tcpClient,SIGNAL(error(QAbstractSocket::SocketError)),this,
            SLOT(displayError(QAbstractSocket::SocketError)));
 
     setWindowTitle("Update");
     setinit();
-
-    //当连接服务器成功时，发出connected()信号，我们开始传送文件
-//    connect(tcpClient,SIGNAL(connected()),this,SLOT(startTransfer()));
-
 }
 
 void TcpClient::setinit()
@@ -30,10 +26,8 @@ void TcpClient::setinit()
     QLabel *port = new QLabel(this);
     host->setText("主机：");
     host->setGeometry(30,30,30,40);
-//    host->show();
     port->setText("端口：");
     port->setGeometry(30,70,30,40);
-//    port->show();
     hostEdit->setGeometry(70,40,120,20);
     portEdit->setGeometry(70,80,120,20);
     status->setText("请输入主机地址和端口号！");
@@ -44,7 +38,7 @@ void TcpClient::setinit()
     connect(syncBt,SIGNAL(clicked(bool)),this,SLOT(send()));
 }
 
-void TcpClient::send()   //连接到服务器，执行发送
+void TcpClient::send()   //连接服务器
 {
     syncBt->setEnabled(false);
     status->setText(tr("连接中..."));
@@ -59,13 +53,13 @@ void TcpClient::acceptfile()  //对方已接受连接
            SLOT(displayError(QAbstractSocket::SocketError)));
 }
 
-void TcpClient::updateClientProgress()  //更新进度条，接收数据
+void TcpClient::updateClientProgress()  //更新进度，接收数据
 {
-   qDebug() << "duang";
    QDataStream in(tcpClient);
    in.setVersion(QDataStream::Qt_5_7);
    if(bytesReceived <= sizeof(qint64)*2)
-   { //如果接收到的数据小于16个字节，那么是刚开始接收数据，我们保存到//来的头文件信息
+   {
+       //如果接收到的数据小于16个字节，那么是刚开始接收数据，我们保存到头文件信息
        if((tcpClient->bytesAvailable() >= sizeof(qint64)*2)
            && (fileNameSize == 0))
        { //接收数据总大小信息和文件名大小信息
@@ -75,12 +69,8 @@ void TcpClient::updateClientProgress()  //更新进度条，接收数据
        if((tcpClient->bytesAvailable() >= fileNameSize)
            && (fileNameSize != 0))
        {  //接收文件名，并建立文件
-           qDebug() << fileName;
-//           QString tmpFileName;
            in >> fileName;
-//           fileName = localFile->fileName();
-           qDebug() << fileName;
-           status->setText(tr("接收文件 %1 ...").arg(fileName));
+           status->setText(tr("接收文件..."));
            bytesReceived += fileNameSize;
            if(!localFile->open(QFile::WriteOnly))
            {
@@ -100,11 +90,11 @@ void TcpClient::updateClientProgress()  //更新进度条，接收数据
 
    if(bytesReceived == totalBytes)
    { //接收数据完成时
-    tcpClient->close();
-    localFile->close();
-    syncBt->setEnabled(true);
-    status->setText(tr("接收文件 %1 成功！").arg(fileName));
-    readFromFile();
+      tcpClient->close();
+      localFile->close();
+      syncBt->setEnabled(true);
+      status->setText(tr("接收文件成功！"));
+      readFromFile();
    }
 }
 
@@ -112,14 +102,33 @@ void TcpClient::displayError(QAbstractSocket::SocketError) //显示错误
 {
     qDebug() << tcpClient->errorString();
     tcpClient->close();
-    status->setText(tr("发送错误"));
+    status->setText(tr("就绪"));
     syncBt->setEnabled(true);
 }
 
-void TcpClient::readFromFile() //接收对方文件时
+void TcpClient::readFromFile() //接收对方文件后，删除原有YourEvent，读取新文件信息，并创建事件
 {
-    //未实现替换现有YourEventList文件！
+    // delete all your events from list
+    if(((MainWindow*)parent())->list->size()!=0)
+    {
+        for(int k = 0; k < ((MainWindow*)parent())->list->size(); k++)
+        {
+            if (((MainWindow*)parent())->list->at(k)->eventType == 1) {
+                if(((MainWindow*)parent())->list->at(k)->eventUI != NULL)
+                {
+                    delete ((MainWindow*)parent())->list->at(k)->eventUI;
+                    ((MainWindow*)parent())->list->at(k)->eventUI = NULL;
+                }
+                ((MainWindow*)parent())->list->removeAt(k);
+                k--;
+            }
+        }
+    }
+
+    // 删除数据库中YourEventList文件！
     ((MainWindow*)parent())->db->deleteAllYourEvent();
+
+    //将接收到的文件写入youreventlist文件，并创建新事件
     if(!localFile->open(QIODevice::ReadWrite | QIODevice::Text))
     {
          qDebug()<<"ReadError: Can't open the file!\n";
@@ -177,6 +186,5 @@ void TcpClient::readFromFile() //接收对方文件时
 
         ((MainWindow*)parent())->createNewEvent(Name, Place, starttime, endtime, type);
     }
-    ((MainWindow*)parent())->refreshAgenda(((MainWindow*)parent())->offset);
     localFile->close();
 }

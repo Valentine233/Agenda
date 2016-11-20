@@ -1,7 +1,5 @@
 #include "opennew.h"
 
-//QList<Event*>* MainWindow::list;
-//QList<Event*>* MainWindow::yourlist;
 void AddEvent(QString, QString, QString, QString);
 
 OpenNew::OpenNew(QWidget* parent):QDialog(parent)
@@ -113,6 +111,7 @@ void OpenNew::setInit(int x, int y)
         weekdays->addButton(weekday,i);
     }
 
+    //add event
     addButton->setText("添加");
     addButton->setGeometry(QRect(300,190,40,20));
     addButton->setStyleSheet("QPushButton {color: black;}");
@@ -126,6 +125,7 @@ void OpenNew::setInit(int x, int y)
     QObject::connect(this, SIGNAL(transAdd(QString, QString, QDateTime, QDateTime, int)), this, SLOT(close()));
     QObject::connect(this, SIGNAL(transAddPl(QString,QString,QDate,QDate,QTime,QTime,int*,int)), this, SLOT(close()));
 
+    //edit event
     confirmButton->setText("确认");
     confirmButton->setGeometry(QRect(300,210,40,20));
     confirmButton->setStyleSheet("QPushButton {color: black;}");
@@ -137,6 +137,7 @@ void OpenNew::setInit(int x, int y)
     QObject::connect(this, SIGNAL(transEdit(QString, QString, QDateTime, QDateTime, int, QString, QString, QDateTime, QDateTime)),
                      this, SLOT(close()));
 
+    //delete event
     deleteButton->setText("删除");
     deleteButton->setGeometry(QRect(200,210,40,20));
     deleteButton->setStyleSheet("QPushButton {color: black;}");
@@ -153,14 +154,28 @@ void OpenNew::setInit(int x, int y)
     // build a temp event
     Event *tempEvent = new Event("未命名","",QDateTime(dateEdit->date(), starttime->dateTime().time()),QDateTime(dateEdit->date(), endtime->dateTime().time()),0,this);
     ((MainWindow*)this->parent())->tempUI = ((MainWindow*)this->parent())->addEventUI(tempEvent);
+
+    // error information
+    QPalette pa;
+    pa.setColor(QPalette::WindowText,Qt::red);
+    namevide->setText("名称不能为空！");
+    namevide->setGeometry(QRect(220,10,120,20));
+    namevide->setPalette(pa);
+    namevide->hide();
+    diffDays->setText("不能添加跨天事件！");
+    diffDays->setGeometry(QRect(20,200,120,20));
+    diffDays->setPalette(pa);
+    diffDays->hide();
 }
 
 void OpenNew::sendAdd() //myevent: type = 0,   yourevent: type = 1
 {
+    namevide->hide();
+    diffDays->hide();
     if (nameinput->text().trimmed().size() == 0) {
+        namevide->show();
         return;
     }
-    connect(this, SIGNAL(diffDaysSignal()), this, SLOT(diffDaysWarning()));
     QDateTime start(dateEdit->date(), starttime->dateTime().time());
     QDateTime end(dateEdit->date(), endtime->dateTime().time());
     QDate sdate(startdate->date());
@@ -176,7 +191,8 @@ void OpenNew::sendAdd() //myevent: type = 0,   yourevent: type = 1
     deleteTemp();
     if(start.time() > end.time())
     {
-        emit diffDaysSignal();
+        diffDays->show();
+        return;
     }
     else if(startdate->isHidden() && enddate->isHidden())
     {
@@ -282,13 +298,3 @@ void OpenNew::deleteEventConfirm(QString name, QString place, QDateTime startTim
         emit deleteConfirm(name, place, startTime, endTime, type);
     }
 }
-
-void OpenNew::diffDaysWarning()
-{
-    QMessageBox messageBox(this);
-    messageBox.setText("不能添加跨天事件！");
-    QAbstractButton *confirmBt = messageBox.addButton(QMessageBox::Ok);
-    messageBox.exec();
-    connect(confirmBt, SIGNAL(clicked(bool)), this, SLOT(close()));
-}
-
